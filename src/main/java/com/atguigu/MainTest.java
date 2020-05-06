@@ -16,7 +16,6 @@ public class MainTest {
 //		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans.xml");
 //		Person bean = (Person) applicationContext.getBean("person");
 //		System.out.println(bean);
-		
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MainConfigOfAOP.class);
 		MathCalculator bean = applicationContext.getBean(MathCalculator.class);
 		bean.div(2,2);

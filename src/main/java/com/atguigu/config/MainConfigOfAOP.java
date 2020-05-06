@@ -2,7 +2,7 @@ package com.atguigu.config;
 
 
 
-import com.atguigu.aop.MathCalculator2;
+import com.atguigu.aop.*;
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.Advisor;
@@ -12,9 +12,6 @@ import org.springframework.beans.factory.config.InstantiationAwareBeanPostProces
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-
-import com.atguigu.aop.LogAspects;
-import com.atguigu.aop.MathCalculator;
 
 /**
  * AOP£º¡¾¶¯Ì¬´úÀí¡¿
@@ -209,6 +206,14 @@ public class MainConfigOfAOP {
 	@Bean
 	public LogAspects logAspects(){
 		return new LogAspects();
+	}
+	@Bean
+	public MyTestBeanfactoryPostProcess myTestBeanfactoryPostProcess(){
+		return new MyTestBeanfactoryPostProcess();
+	}
+	@Bean
+	public MyTestBeanDefinitionRegistryPostProcessor myTestBeanDefinitionRegistryPostProcessor(){
+		return new MyTestBeanDefinitionRegistryPostProcessor();
 	}
 }
 

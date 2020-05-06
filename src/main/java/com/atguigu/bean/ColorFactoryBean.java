@@ -1,6 +1,7 @@
 package com.atguigu.bean;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 //创建一个Spring定义的FactoryBean
 public class ColorFactoryBean implements FactoryBean<Color> {
@@ -12,7 +13,6 @@ public class ColorFactoryBean implements FactoryBean<Color> {
 		System.out.println("ColorFactoryBean...getObject...");
 		return new Color();
 	}
-
 	@Override
 	public Class<?> getObjectType() {
 		// TODO Auto-generated method stub
