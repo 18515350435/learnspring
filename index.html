@@ -1,53 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <title></title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星光小马妆造馆 · 玩家端</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header class="site-header">
-        <div class="container">
-            <h1 class="site-title">站点标题</h1>
-            <nav class="site-nav">
-                <ul>
-                    <li><a href="#">首页</a></li>
-                    <li><a href="#">关于</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<header class="app-header">
+  <div class="wrap head-wrap">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-text">
+        <b>星光小马妆造馆</b>
+        <i>做任务 · 攒饰品 · 打扮自己的小伙伴</i>
+      </span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" data-tab="studio" type="button">妆造台</button>
+      <button class="nav-btn" data-tab="tasks" type="button">任务<em id="pendingBadge" class="dot">0</em></button>
+      <button class="nav-btn" data-tab="gallery" type="button">图鉴</button>
+      <a class="nav-btn alt" href="admin.html">家长端</a>
+    </nav>
+    <div class="who"><i>你好，</i><b id="playerName">小朋友</b></div>
+  </div>
+</header>
 
-    <main class="container">
+<main class="wrap main">
+  <div id="panel"></div>
+</main>
 
-        <section class="hero">
-            <h2>主标题</h2>
-            <p>在这里写一段介绍文字。</p>
-            <a class="btn" href="#">开始</a>
-        </section>
+<footer class="app-footer">
+  <p>本页为个人学习用途的同人小游戏，小马宝莉（My Little Pony）相关形象版权归 Hasbro 所有。</p>
+</footer>
 
-        <section class="content">
-            <article>
-                <h3>区块一</h3>
-                <p>内容占位。</p>
-            </article>
-            <article>
-                <h3>区块二</h3>
-                <p>内容占位。</p>
-            </article>
-        </section>
-
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026</p>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
+<script src="js/data.js"></script>
+<script src="js/pony.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

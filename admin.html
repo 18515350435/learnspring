@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星光小马妆造馆 · 家长端</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header admin">
+  <div class="wrap head-wrap">
+    <div class="brand">
+      <span class="brand-mark admin"></span>
+      <span class="brand-text">
+        <b>家长管理端</b>
+        <i>审核任务 · 管理解锁 · 自定义奖励</i>
+      </span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" data-atab="review" type="button">待审核<em id="adminBadge" class="dot">0</em></button>
+      <button class="nav-btn" data-atab="tasks" type="button">任务总览</button>
+      <button class="nav-btn" data-atab="manage" type="button">解锁管理</button>
+      <button class="nav-btn" data-atab="data" type="button">数据与设置</button>
+      <a class="nav-btn alt" href="index.html">返回玩家端</a>
+    </nav>
+    <div class="who"><i>审核身份</i><b>家长</b></div>
+  </div>
+</header>
+
+<div class="wrap lock" id="lockScreen">
+  <div class="lock-card">
+    <h2>家长验证</h2>
+    <p class="muted">请输入管理端密码后进入（初始密码 1234，可在「数据与设置」里修改）。</p>
+    <input id="pinField" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="管理端密码">
+    <p class="pin-err" id="pinErr"></p>
+    <button class="btn primary" id="pinBtn" data-lockbtn type="button">进入</button>
+  </div>
+</div>
+
+<main class="wrap main" id="adminBody" style="display:none">
+  <div id="adminPanel"></div>
+</main>
+
+<footer class="app-footer">
+  <p>存档保存在本机浏览器（localStorage），与玩家端实时互通。本页为个人学习用途的同人项目，小马宝莉形象版权归 Hasbro 所有。</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/pony.js"></script>
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
