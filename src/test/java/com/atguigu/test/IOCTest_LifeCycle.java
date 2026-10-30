@@ -9,12 +9,12 @@
 //
 //	@Test
 //	public void test01(){
-//		//1、创建ioc容器
+//		//1銆佸垱寤篿oc瀹瑰櫒
 //		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(MainConfigOfLifeCycle.class);
-//		System.out.println("容器创建完成...");
+//		System.out.println("瀹瑰櫒鍒涘缓瀹屾垚...");
 //
 //		//applicationContext.getBean("car");
-//		//关闭容器
+//		//鍏抽棴瀹瑰櫒
 //		applicationContext.close();
 //	}
 //

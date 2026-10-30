@@ -3,17 +3,17 @@ package com.atguigu.bean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-//Ä¬ÈÏ¼ÓÔÚiocÈİÆ÷ÖĞµÄ×é¼ş£¬ÈİÆ÷Æô¶¯»áµ÷ÓÃÎŞ²Î¹¹ÔìÆ÷´´½¨¶ÔÏó£¬ÔÙ½øĞĞ³õÊ¼»¯¸³ÖµµÈ²Ù×÷
+//é»˜è®¤åŠ åœ¨iocå®¹å™¨ä¸­çš„ç»„ä»¶ï¼Œå®¹å™¨å¯åŠ¨ä¼šè°ƒç”¨æ— å‚æ„é€ å™¨åˆ›å»ºå¯¹è±¡ï¼Œå†è¿›è¡Œåˆå§‹åŒ–èµ‹å€¼ç­‰æ“ä½œ
 @Component
 public class Boss {
 	
 	
 	private Car car;
 	
-	//¹¹ÔìÆ÷ÒªÓÃµÄ×é¼ş£¬¶¼ÊÇ´ÓÈİÆ÷ÖĞ»ñÈ¡
+	//æ„é€ å™¨è¦ç”¨çš„ç»„ä»¶ï¼Œéƒ½æ˜¯ä»å®¹å™¨ä¸­è·å–
 	public Boss(Car car){
 		this.car = car;
-		System.out.println("Boss...ÓĞ²Î¹¹ÔìÆ÷");
+		System.out.println("Boss...æœ‰å‚æ„é€ å™¨");
 	}
 	
 	
@@ -24,8 +24,8 @@ public class Boss {
 
 
 	//@Autowired 
-	//±ê×¢ÔÚ·½·¨£¬SpringÈİÆ÷´´½¨µ±Ç°¶ÔÏó£¬¾Í»áµ÷ÓÃ·½·¨£¬Íê³É¸³Öµ£»
-	//·½·¨Ê¹ÓÃµÄ²ÎÊı£¬×Ô¶¨ÒåÀàĞÍµÄÖµ´ÓiocÈİÆ÷ÖĞ»ñÈ¡
+	//æ ‡æ³¨åœ¨æ–¹æ³•ï¼ŒSpringå®¹å™¨åˆ›å»ºå½“å‰å¯¹è±¡ï¼Œå°±ä¼šè°ƒç”¨æ–¹æ³•ï¼Œå®Œæˆèµ‹å€¼ï¼›
+	//æ–¹æ³•ä½¿ç”¨çš„å‚æ•°ï¼Œè‡ªå®šä¹‰ç±»å‹çš„å€¼ä»iocå®¹å™¨ä¸­è·å–
 	public void setCar(Car car) {
 		this.car = car;
 	}

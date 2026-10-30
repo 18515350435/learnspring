@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.atguigu.bean.Person;
 
-//Ê¹ÓÃ@PropertySource¶ÁÈ¡Íâ²¿ÅäÖÃÎÄ¼şÖĞµÄk/v±£´æµ½ÔËĞĞµÄ»·¾³±äÁ¿ÖĞ;¼ÓÔØÍêÍâ²¿µÄÅäÖÃÎÄ¼şÒÔºóÊ¹ÓÃ${}È¡³öÅäÖÃÎÄ¼şµÄÖµ
+//ä½¿ç”¨@PropertySourceè¯»å–å¤–éƒ¨é…ç½®æ–‡ä»¶ä¸­çš„k/vä¿å­˜åˆ°è¿è¡Œçš„ç¯å¢ƒå˜é‡ä¸­;åŠ è½½å®Œå¤–éƒ¨çš„é…ç½®æ–‡ä»¶ä»¥åä½¿ç”¨${}å–å‡ºé…ç½®æ–‡ä»¶çš„å€¼
 @PropertySource(value={"classpath:/person.properties"})
 @Configuration
 public class MainConfigOfPropertyValues {

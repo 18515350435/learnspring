@@ -14,176 +14,176 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
- * AOP£º¡¾¶¯Ì¬´úÀí¡¿
- * 		Ö¸ÔÚ³ÌÐòÔËÐÐÆÚ¼ä¶¯Ì¬µÄ½«Ä³¶Î´úÂëÇÐÈëµ½Ö¸¶¨·½·¨Ö¸¶¨Î»ÖÃ½øÐÐÔËÐÐµÄ±à³Ì·½Ê½£»
+ * AOPï¼šã€åŠ¨æ€ä»£ç†ã€‘
+ * 		æŒ‡åœ¨ç¨‹åºè¿è¡ŒæœŸé—´åŠ¨æ€çš„å°†æŸæ®µä»£ç åˆ‡å…¥åˆ°æŒ‡å®šæ–¹æ³•æŒ‡å®šä½ç½®è¿›è¡Œè¿è¡Œçš„ç¼–ç¨‹æ–¹å¼ï¼›
  * 
- * 1¡¢µ¼ÈëaopÄ£¿é£»Spring AOP£º(spring-aspects)
- * 2¡¢¶¨ÒåÒ»¸öÒµÎñÂß¼­Àà£¨MathCalculator£©£»ÔÚÒµÎñÂß¼­ÔËÐÐµÄÊ±ºò½«ÈÕÖ¾½øÐÐ´òÓ¡£¨·½·¨Ö®Ç°¡¢·½·¨ÔËÐÐ½áÊø¡¢·½·¨³öÏÖÒì³££¬xxx£©
- * 3¡¢¶¨ÒåÒ»¸öÈÕÖ¾ÇÐÃæÀà£¨LogAspects£©£ºÇÐÃæÀàÀïÃæµÄ·½·¨ÐèÒª¶¯Ì¬¸ÐÖªMathCalculator.divÔËÐÐµ½ÄÄÀïÈ»ºóÖ´ÐÐ£»
- * 		Í¨Öª·½·¨£º
- * 			Ç°ÖÃÍ¨Öª(@Before)£ºlogStart£ºÔÚÄ¿±ê·½·¨(div)ÔËÐÐÖ®Ç°ÔËÐÐ
- * 			ºóÖÃÍ¨Öª(@After)£ºlogEnd£ºÔÚÄ¿±ê·½·¨(div)ÔËÐÐ½áÊøÖ®ºóÔËÐÐ£¨ÎÞÂÛ·½·¨Õý³£½áÊø»¹ÊÇÒì³£½áÊø£©
- * 			·µ»ØÍ¨Öª(@AfterReturning)£ºlogReturn£ºÔÚÄ¿±ê·½·¨(div)Õý³£·µ»ØÖ®ºóÔËÐÐ
- * 			Òì³£Í¨Öª(@AfterThrowing)£ºlogException£ºÔÚÄ¿±ê·½·¨(div)³öÏÖÒì³£ÒÔºóÔËÐÐ
- * 			»·ÈÆÍ¨Öª(@Around)£º¶¯Ì¬´úÀí£¬ÊÖ¶¯ÍÆ½øÄ¿±ê·½·¨ÔËÐÐ£¨joinPoint.procced()£©
- * 4¡¢¸øÇÐÃæÀàµÄÄ¿±ê·½·¨±ê×¢ºÎÊ±ºÎµØÔËÐÐ£¨Í¨Öª×¢½â£©£»
- * 5¡¢½«ÇÐÃæÀàºÍÒµÎñÂß¼­Àà£¨Ä¿±ê·½·¨ËùÔÚÀà£©¶¼¼ÓÈëµ½ÈÝÆ÷ÖÐ;
- * 6¡¢±ØÐë¸æËßSpringÄÄ¸öÀàÊÇÇÐÃæÀà(¸øÇÐÃæÀàÉÏ¼ÓÒ»¸ö×¢½â£º@Aspect)
- * [7]¡¢¸øÅäÖÃÀàÖÐ¼Ó @EnableAspectJAutoProxy ¡¾¿ªÆô»ùÓÚ×¢½âµÄaopÄ£Ê½¡¿
- * 		ÔÚSpringÖÐºÜ¶àµÄ @EnableXXX;
+ * 1ã€å¯¼å…¥aopæ¨¡å—ï¼›Spring AOPï¼š(spring-aspects)
+ * 2ã€å®šä¹‰ä¸€ä¸ªä¸šåŠ¡é€»è¾‘ç±»ï¼ˆMathCalculatorï¼‰ï¼›åœ¨ä¸šåŠ¡é€»è¾‘è¿è¡Œçš„æ—¶å€™å°†æ—¥å¿—è¿›è¡Œæ‰“å°ï¼ˆæ–¹æ³•ä¹‹å‰ã€æ–¹æ³•è¿è¡Œç»“æŸã€æ–¹æ³•å‡ºçŽ°å¼‚å¸¸ï¼Œxxxï¼‰
+ * 3ã€å®šä¹‰ä¸€ä¸ªæ—¥å¿—åˆ‡é¢ç±»ï¼ˆLogAspectsï¼‰ï¼šåˆ‡é¢ç±»é‡Œé¢çš„æ–¹æ³•éœ€è¦åŠ¨æ€æ„ŸçŸ¥MathCalculator.divè¿è¡Œåˆ°å“ªé‡Œç„¶åŽæ‰§è¡Œï¼›
+ * 		é€šçŸ¥æ–¹æ³•ï¼š
+ * 			å‰ç½®é€šçŸ¥(@Before)ï¼šlogStartï¼šåœ¨ç›®æ ‡æ–¹æ³•(div)è¿è¡Œä¹‹å‰è¿è¡Œ
+ * 			åŽç½®é€šçŸ¥(@After)ï¼šlogEndï¼šåœ¨ç›®æ ‡æ–¹æ³•(div)è¿è¡Œç»“æŸä¹‹åŽè¿è¡Œï¼ˆæ— è®ºæ–¹æ³•æ­£å¸¸ç»“æŸè¿˜æ˜¯å¼‚å¸¸ç»“æŸï¼‰
+ * 			è¿”å›žé€šçŸ¥(@AfterReturning)ï¼šlogReturnï¼šåœ¨ç›®æ ‡æ–¹æ³•(div)æ­£å¸¸è¿”å›žä¹‹åŽè¿è¡Œ
+ * 			å¼‚å¸¸é€šçŸ¥(@AfterThrowing)ï¼šlogExceptionï¼šåœ¨ç›®æ ‡æ–¹æ³•(div)å‡ºçŽ°å¼‚å¸¸ä»¥åŽè¿è¡Œ
+ * 			çŽ¯ç»•é€šçŸ¥(@Around)ï¼šåŠ¨æ€ä»£ç†ï¼Œæ‰‹åŠ¨æŽ¨è¿›ç›®æ ‡æ–¹æ³•è¿è¡Œï¼ˆjoinPoint.procced()ï¼‰
+ * 4ã€ç»™åˆ‡é¢ç±»çš„ç›®æ ‡æ–¹æ³•æ ‡æ³¨ä½•æ—¶ä½•åœ°è¿è¡Œï¼ˆé€šçŸ¥æ³¨è§£ï¼‰ï¼›
+ * 5ã€å°†åˆ‡é¢ç±»å’Œä¸šåŠ¡é€»è¾‘ç±»ï¼ˆç›®æ ‡æ–¹æ³•æ‰€åœ¨ç±»ï¼‰éƒ½åŠ å…¥åˆ°å®¹å™¨ä¸­;
+ * 6ã€å¿…é¡»å‘Šè¯‰Springå“ªä¸ªç±»æ˜¯åˆ‡é¢ç±»(ç»™åˆ‡é¢ç±»ä¸ŠåŠ ä¸€ä¸ªæ³¨è§£ï¼š@Aspect)
+ * [7]ã€ç»™é…ç½®ç±»ä¸­åŠ  @EnableAspectJAutoProxy ã€å¼€å¯åŸºäºŽæ³¨è§£çš„aopæ¨¡å¼ã€‘
+ * 		åœ¨Springä¸­å¾ˆå¤šçš„ @EnableXXX;
  * 
- * Èý²½£º
- * 	1£©¡¢½«ÒµÎñÂß¼­×é¼þºÍÇÐÃæÀà¶¼¼ÓÈëµ½ÈÝÆ÷ÖÐ£»¸æËßSpringÄÄ¸öÊÇÇÐÃæÀà£¨@Aspect£©
- * 	2£©¡¢ÔÚÇÐÃæÀàÉÏµÄÃ¿Ò»¸öÍ¨Öª·½·¨ÉÏ±ê×¢Í¨Öª×¢½â£¬¸æËßSpringºÎÊ±ºÎµØÔËÐÐ£¨ÇÐÈëµã±í´ïÊ½£©
- *  3£©¡¢¿ªÆô»ùÓÚ×¢½âµÄaopÄ£Ê½£»@EnableAspectJAutoProxy
+ * ä¸‰æ­¥ï¼š
+ * 	1ï¼‰ã€å°†ä¸šåŠ¡é€»è¾‘ç»„ä»¶å’Œåˆ‡é¢ç±»éƒ½åŠ å…¥åˆ°å®¹å™¨ä¸­ï¼›å‘Šè¯‰Springå“ªä¸ªæ˜¯åˆ‡é¢ç±»ï¼ˆ@Aspectï¼‰
+ * 	2ï¼‰ã€åœ¨åˆ‡é¢ç±»ä¸Šçš„æ¯ä¸€ä¸ªé€šçŸ¥æ–¹æ³•ä¸Šæ ‡æ³¨é€šçŸ¥æ³¨è§£ï¼Œå‘Šè¯‰Springä½•æ—¶ä½•åœ°è¿è¡Œï¼ˆåˆ‡å…¥ç‚¹è¡¨è¾¾å¼ï¼‰
+ *  3ï¼‰ã€å¼€å¯åŸºäºŽæ³¨è§£çš„aopæ¨¡å¼ï¼›@EnableAspectJAutoProxy
  *  
- * AOPÔ­Àí£º¡¾¿´¸øÈÝÆ÷ÖÐ×¢²áÁËÊ²Ã´×é¼þ£¬Õâ¸ö×é¼þÊ²Ã´Ê±ºò¹¤×÷£¬Õâ¸ö×é¼þµÄ¹¦ÄÜÊÇÊ²Ã´£¿¡¿
- * 		@EnableAspectJAutoProxy£»
- * 1¡¢@EnableAspectJAutoProxyÊÇÊ²Ã´£¿
- * 		@Import(AspectJAutoProxyRegistrar.class)£º¸øÈÝÆ÷ÖÐµ¼ÈëAspectJAutoProxyRegistrar
- * 			ÀûÓÃAspectJAutoProxyRegistrar×Ô¶¨Òå¸øÈÝÆ÷ÖÐ×¢²ábean£»BeanDefinetion
+ * AOPåŽŸç†ï¼šã€çœ‹ç»™å®¹å™¨ä¸­æ³¨å†Œäº†ä»€ä¹ˆç»„ä»¶ï¼Œè¿™ä¸ªç»„ä»¶ä»€ä¹ˆæ—¶å€™å·¥ä½œï¼Œè¿™ä¸ªç»„ä»¶çš„åŠŸèƒ½æ˜¯ä»€ä¹ˆï¼Ÿã€‘
+ * 		@EnableAspectJAutoProxyï¼›
+ * 1ã€@EnableAspectJAutoProxyæ˜¯ä»€ä¹ˆï¼Ÿ
+ * 		@Import(AspectJAutoProxyRegistrar.class)ï¼šç»™å®¹å™¨ä¸­å¯¼å…¥AspectJAutoProxyRegistrar
+ * 			åˆ©ç”¨AspectJAutoProxyRegistrarè‡ªå®šä¹‰ç»™å®¹å™¨ä¸­æ³¨å†Œbeanï¼›BeanDefinetion
  * 			internalAutoProxyCreator=AnnotationAwareAspectJAutoProxyCreator
  * 
- * 		¸øÈÝÆ÷ÖÐ×¢²áÒ»¸öAnnotationAwareAspectJAutoProxyCreator£»
+ * 		ç»™å®¹å™¨ä¸­æ³¨å†Œä¸€ä¸ªAnnotationAwareAspectJAutoProxyCreatorï¼›
  * 
- * 2¡¢ AnnotationAwareAspectJAutoProxyCreator£º
+ * 2ã€ AnnotationAwareAspectJAutoProxyCreatorï¼š
  * 		AnnotationAwareAspectJAutoProxyCreator
  * 			->AspectJAwareAdvisorAutoProxyCreator
  * 				->AbstractAdvisorAutoProxyCreator
  * 					->AbstractAutoProxyCreator
  * 							implements SmartInstantiationAwareBeanPostProcessor, BeanFactoryAware
- * 						¹Ø×¢ºóÖÃ´¦ÀíÆ÷£¨ÔÚbean³õÊ¼»¯Íê³ÉÇ°ºó×öÊÂÇé£©¡¢×Ô¶¯×°ÅäBeanFactory
+ * 						å…³æ³¨åŽç½®å¤„ç†å™¨ï¼ˆåœ¨beanåˆå§‹åŒ–å®Œæˆå‰åŽåšäº‹æƒ…ï¼‰ã€è‡ªåŠ¨è£…é…BeanFactory
  * 
  * AbstractAutoProxyCreator.setBeanFactory()
- * AbstractAutoProxyCreator.ÓÐºóÖÃ´¦ÀíÆ÷µÄÂß¼­£»
+ * AbstractAutoProxyCreator.æœ‰åŽç½®å¤„ç†å™¨çš„é€»è¾‘ï¼›
  * 
- * AbstractAdvisorAutoProxyCreator.setBeanFactory()-¡·initBeanFactory()
+ * AbstractAdvisorAutoProxyCreator.setBeanFactory()-ã€‹initBeanFactory()
  * 
  * AnnotationAwareAspectJAutoProxyCreator.initBeanFactory()
  *
  *
- * Á÷³Ì£º
- * 		1£©¡¢´«ÈëÅäÖÃÀà£¬´´½¨iocÈÝÆ÷
- * 		2£©¡¢×¢²áÅäÖÃÀà£¬µ÷ÓÃrefresh£¨£©Ë¢ÐÂÈÝÆ÷£»
- * 		3£©¡¢registerBeanPostProcessors(beanFactory);×¢²ábeanµÄºóÖÃ´¦ÀíÆ÷À´·½±ãÀ¹½ØbeanµÄ´´½¨£»
- * 			1£©¡¢ÏÈ»ñÈ¡iocÈÝÆ÷ÒÑ¾­¶¨ÒåÁËµÄÐèÒª´´½¨¶ÔÏóµÄËùÓÐBeanPostProcessor
- * 			2£©¡¢¸øÈÝÆ÷ÖÐ¼Ó±ðµÄBeanPostProcessor
- * 			3£©¡¢ÓÅÏÈ×¢²áÊµÏÖÁËPriorityOrdered½Ó¿ÚµÄBeanPostProcessor£»
- * 			4£©¡¢ÔÙ¸øÈÝÆ÷ÖÐ×¢²áÊµÏÖÁËOrdered½Ó¿ÚµÄBeanPostProcessor£»
- * 			5£©¡¢×¢²áÃ»ÊµÏÖÓÅÏÈ¼¶½Ó¿ÚµÄBeanPostProcessor£»
- * 			6£©¡¢×¢²áBeanPostProcessor£¬Êµ¼ÊÉÏ¾ÍÊÇ´´½¨BeanPostProcessor¶ÔÏó£¬±£´æÔÚÈÝÆ÷ÖÐ£»
- * 				´´½¨internalAutoProxyCreatorµÄBeanPostProcessor¡¾AnnotationAwareAspectJAutoProxyCreator¡¿
- * 				1£©¡¢´´½¨BeanµÄÊµÀý
- * 				2£©¡¢populateBean£»¸øbeanµÄ¸÷ÖÖÊôÐÔ¸³Öµ
- * 				3£©¡¢initializeBean£º³õÊ¼»¯bean£»
- * 						1£©¡¢invokeAwareMethods()£º´¦ÀíAware½Ó¿ÚµÄ·½·¨»Øµ÷
- * 						2£©¡¢applyBeanPostProcessorsBeforeInitialization()£ºÓ¦ÓÃºóÖÃ´¦ÀíÆ÷µÄpostProcessBeforeInitialization£¨£©
- * 						3£©¡¢invokeInitMethods()£»Ö´ÐÐ×Ô¶¨ÒåµÄ³õÊ¼»¯·½·¨
- * 						4£©¡¢applyBeanPostProcessorsAfterInitialization()£»Ö´ÐÐºóÖÃ´¦ÀíÆ÷µÄpostProcessAfterInitialization£¨£©£»
- * 				4£©¡¢BeanPostProcessor(AnnotationAwareAspectJAutoProxyCreator)´´½¨³É¹¦£»--¡·aspectJAdvisorsBuilder
- * 			7£©¡¢°ÑBeanPostProcessor×¢²áµ½BeanFactoryÖÐ£»
+ * æµç¨‹ï¼š
+ * 		1ï¼‰ã€ä¼ å…¥é…ç½®ç±»ï¼Œåˆ›å»ºiocå®¹å™¨
+ * 		2ï¼‰ã€æ³¨å†Œé…ç½®ç±»ï¼Œè°ƒç”¨refreshï¼ˆï¼‰åˆ·æ–°å®¹å™¨ï¼›
+ * 		3ï¼‰ã€registerBeanPostProcessors(beanFactory);æ³¨å†Œbeançš„åŽç½®å¤„ç†å™¨æ¥æ–¹ä¾¿æ‹¦æˆªbeançš„åˆ›å»ºï¼›
+ * 			1ï¼‰ã€å…ˆèŽ·å–iocå®¹å™¨å·²ç»å®šä¹‰äº†çš„éœ€è¦åˆ›å»ºå¯¹è±¡çš„æ‰€æœ‰BeanPostProcessor
+ * 			2ï¼‰ã€ç»™å®¹å™¨ä¸­åŠ åˆ«çš„BeanPostProcessor
+ * 			3ï¼‰ã€ä¼˜å…ˆæ³¨å†Œå®žçŽ°äº†PriorityOrderedæŽ¥å£çš„BeanPostProcessorï¼›
+ * 			4ï¼‰ã€å†ç»™å®¹å™¨ä¸­æ³¨å†Œå®žçŽ°äº†OrderedæŽ¥å£çš„BeanPostProcessorï¼›
+ * 			5ï¼‰ã€æ³¨å†Œæ²¡å®žçŽ°ä¼˜å…ˆçº§æŽ¥å£çš„BeanPostProcessorï¼›
+ * 			6ï¼‰ã€æ³¨å†ŒBeanPostProcessorï¼Œå®žé™…ä¸Šå°±æ˜¯åˆ›å»ºBeanPostProcessorå¯¹è±¡ï¼Œä¿å­˜åœ¨å®¹å™¨ä¸­ï¼›
+ * 				åˆ›å»ºinternalAutoProxyCreatorçš„BeanPostProcessorã€AnnotationAwareAspectJAutoProxyCreatorã€‘
+ * 				1ï¼‰ã€åˆ›å»ºBeançš„å®žä¾‹
+ * 				2ï¼‰ã€populateBeanï¼›ç»™beançš„å„ç§å±žæ€§èµ‹å€¼
+ * 				3ï¼‰ã€initializeBeanï¼šåˆå§‹åŒ–beanï¼›
+ * 						1ï¼‰ã€invokeAwareMethods()ï¼šå¤„ç†AwareæŽ¥å£çš„æ–¹æ³•å›žè°ƒ
+ * 						2ï¼‰ã€applyBeanPostProcessorsBeforeInitialization()ï¼šåº”ç”¨åŽç½®å¤„ç†å™¨çš„postProcessBeforeInitializationï¼ˆï¼‰
+ * 						3ï¼‰ã€invokeInitMethods()ï¼›æ‰§è¡Œè‡ªå®šä¹‰çš„åˆå§‹åŒ–æ–¹æ³•
+ * 						4ï¼‰ã€applyBeanPostProcessorsAfterInitialization()ï¼›æ‰§è¡ŒåŽç½®å¤„ç†å™¨çš„postProcessAfterInitializationï¼ˆï¼‰ï¼›
+ * 				4ï¼‰ã€BeanPostProcessor(AnnotationAwareAspectJAutoProxyCreator)åˆ›å»ºæˆåŠŸï¼›--ã€‹aspectJAdvisorsBuilder
+ * 			7ï¼‰ã€æŠŠBeanPostProcessoræ³¨å†Œåˆ°BeanFactoryä¸­ï¼›
  * 				beanFactory.addBeanPostProcessor(postProcessor);
- * =======ÒÔÉÏÊÇ´´½¨ºÍ×¢²áAnnotationAwareAspectJAutoProxyCreatorµÄ¹ý³Ì========
+ * =======ä»¥ä¸Šæ˜¯åˆ›å»ºå’Œæ³¨å†ŒAnnotationAwareAspectJAutoProxyCreatorçš„è¿‡ç¨‹========
  * 
  * 			AnnotationAwareAspectJAutoProxyCreator => InstantiationAwareBeanPostProcessor
- * 		4£©¡¢finishBeanFactoryInitialization(beanFactory);Íê³ÉBeanFactory³õÊ¼»¯¹¤×÷£»´´½¨Ê£ÏÂµÄµ¥ÊµÀýbean
- * 			1£©¡¢±éÀú»ñÈ¡ÈÝÆ÷ÖÐËùÓÐµÄBean£¬ÒÀ´Î´´½¨¶ÔÏógetBean(beanName);
+ * 		4ï¼‰ã€finishBeanFactoryInitialization(beanFactory);å®ŒæˆBeanFactoryåˆå§‹åŒ–å·¥ä½œï¼›åˆ›å»ºå‰©ä¸‹çš„å•å®žä¾‹bean
+ * 			1ï¼‰ã€éåŽ†èŽ·å–å®¹å™¨ä¸­æ‰€æœ‰çš„Beanï¼Œä¾æ¬¡åˆ›å»ºå¯¹è±¡getBean(beanName);
  * 				getBean->doGetBean()->getSingleton()->
- * 			2£©¡¢´´½¨bean
- * 				¡¾AnnotationAwareAspectJAutoProxyCreatorÔÚËùÓÐbean´´½¨Ö®Ç°»áÓÐÒ»¸öÀ¹½Ø£¬InstantiationAwareBeanPostProcessor£¬»áµ÷ÓÃpostProcessBeforeInstantiation()¡¿
- * 				1£©¡¢ÏÈ´Ó»º´æÖÐ»ñÈ¡µ±Ç°bean£¬Èç¹ûÄÜ»ñÈ¡µ½£¬ËµÃ÷beanÊÇÖ®Ç°±»´´½¨¹ýµÄ£¬Ö±½ÓÊ¹ÓÃ£¬·ñÔòÔÙ´´½¨£»
- * 					Ö»Òª´´½¨ºÃµÄBean¶¼»á±»»º´æÆðÀ´
- * 				2£©¡¢createBean£¨£©;´´½¨bean£»
- * 					AnnotationAwareAspectJAutoProxyCreator »áÔÚÈÎºÎbean´´½¨Ö®Ç°ÏÈ³¢ÊÔ·µ»ØbeanµÄÊµÀý
- * 					¡¾BeanPostProcessorÊÇÔÚBean¶ÔÏó´´½¨Íê³É³õÊ¼»¯Ç°ºóµ÷ÓÃµÄ¡¿
- * 					¡¾InstantiationAwareBeanPostProcessorÊÇÔÚ´´½¨BeanÊµÀýÖ®Ç°ÏÈ³¢ÊÔÓÃºóÖÃ´¦ÀíÆ÷·µ»Ø¶ÔÏóµÄ¡¿
- * 					1£©¡¢resolveBeforeInstantiation(beanName, mbdToUse);½âÎöBeforeInstantiation
- * 						Ï£ÍûºóÖÃ´¦ÀíÆ÷ÔÚ´ËÄÜ·µ»ØÒ»¸ö´úÀí¶ÔÏó£»Èç¹ûÄÜ·µ»Ø´úÀí¶ÔÏó¾ÍÊ¹ÓÃ£¬Èç¹û²»ÄÜ¾Í¼ÌÐø
- * 						1£©¡¢ºóÖÃ´¦ÀíÆ÷ÏÈ³¢ÊÔ·µ»Ø¶ÔÏó£»
- * 							bean = applyBeanPostProcessorsBeforeInstantiation£¨£©£º
- * 								ÄÃµ½ËùÓÐºóÖÃ´¦ÀíÆ÷£¬Èç¹ûÊÇInstantiationAwareBeanPostProcessor;
- * 								¾ÍÖ´ÐÐpostProcessBeforeInstantiation
+ * 			2ï¼‰ã€åˆ›å»ºbean
+ * 				ã€AnnotationAwareAspectJAutoProxyCreatoråœ¨æ‰€æœ‰beanåˆ›å»ºä¹‹å‰ä¼šæœ‰ä¸€ä¸ªæ‹¦æˆªï¼ŒInstantiationAwareBeanPostProcessorï¼Œä¼šè°ƒç”¨postProcessBeforeInstantiation()ã€‘
+ * 				1ï¼‰ã€å…ˆä»Žç¼“å­˜ä¸­èŽ·å–å½“å‰beanï¼Œå¦‚æžœèƒ½èŽ·å–åˆ°ï¼Œè¯´æ˜Žbeanæ˜¯ä¹‹å‰è¢«åˆ›å»ºè¿‡çš„ï¼Œç›´æŽ¥ä½¿ç”¨ï¼Œå¦åˆ™å†åˆ›å»ºï¼›
+ * 					åªè¦åˆ›å»ºå¥½çš„Beanéƒ½ä¼šè¢«ç¼“å­˜èµ·æ¥
+ * 				2ï¼‰ã€createBeanï¼ˆï¼‰;åˆ›å»ºbeanï¼›
+ * 					AnnotationAwareAspectJAutoProxyCreator ä¼šåœ¨ä»»ä½•beanåˆ›å»ºä¹‹å‰å…ˆå°è¯•è¿”å›žbeançš„å®žä¾‹
+ * 					ã€BeanPostProcessoræ˜¯åœ¨Beanå¯¹è±¡åˆ›å»ºå®Œæˆåˆå§‹åŒ–å‰åŽè°ƒç”¨çš„ã€‘
+ * 					ã€InstantiationAwareBeanPostProcessoræ˜¯åœ¨åˆ›å»ºBeanå®žä¾‹ä¹‹å‰å…ˆå°è¯•ç”¨åŽç½®å¤„ç†å™¨è¿”å›žå¯¹è±¡çš„ã€‘
+ * 					1ï¼‰ã€resolveBeforeInstantiation(beanName, mbdToUse);è§£æžBeforeInstantiation
+ * 						å¸Œæœ›åŽç½®å¤„ç†å™¨åœ¨æ­¤èƒ½è¿”å›žä¸€ä¸ªä»£ç†å¯¹è±¡ï¼›å¦‚æžœèƒ½è¿”å›žä»£ç†å¯¹è±¡å°±ä½¿ç”¨ï¼Œå¦‚æžœä¸èƒ½å°±ç»§ç»­
+ * 						1ï¼‰ã€åŽç½®å¤„ç†å™¨å…ˆå°è¯•è¿”å›žå¯¹è±¡ï¼›
+ * 							bean = applyBeanPostProcessorsBeforeInstantiationï¼ˆï¼‰ï¼š
+ * 								æ‹¿åˆ°æ‰€æœ‰åŽç½®å¤„ç†å™¨ï¼Œå¦‚æžœæ˜¯InstantiationAwareBeanPostProcessor;
+ * 								å°±æ‰§è¡ŒpostProcessBeforeInstantiation
  * 							if (bean != null) {
 								bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 							}
  * 
- * 					2£©¡¢doCreateBean(beanName, mbdToUse, args);ÕæÕýµÄÈ¥´´½¨Ò»¸öbeanÊµÀý£»ºÍ3.6Á÷³ÌÒ»Ñù£»
- * 					3£©¡¢
+ * 					2ï¼‰ã€doCreateBean(beanName, mbdToUse, args);çœŸæ­£çš„åŽ»åˆ›å»ºä¸€ä¸ªbeanå®žä¾‹ï¼›å’Œ3.6æµç¨‹ä¸€æ ·ï¼›
+ * 					3ï¼‰ã€
  * 			
  * 		
- * AnnotationAwareAspectJAutoProxyCreator¡¾InstantiationAwareBeanPostProcessor¡¿	µÄ×÷ÓÃ£º
- * 1£©¡¢Ã¿Ò»¸öbean´´½¨Ö®Ç°£¬µ÷ÓÃpostProcessBeforeInstantiation()£»
- * 		¹ØÐÄMathCalculatorºÍLogAspectµÄ´´½¨
- * 		1£©¡¢ÅÐ¶Ïµ±Ç°beanÊÇ·ñÔÚadvisedBeansÖÐ£¨±£´æÁËËùÓÐÐèÒªÔöÇ¿bean£©
- * 		2£©¡¢ÅÐ¶Ïµ±Ç°beanÊÇ·ñÊÇ»ù´¡ÀàÐÍµÄAdvice¡¢Pointcut¡¢Advisor¡¢AopInfrastructureBean£¬
- * 			»òÕßÊÇ·ñÊÇÇÐÃæ£¨@Aspect£©
- * 		3£©¡¢ÊÇ·ñÐèÒªÌø¹ý
- * 			1£©¡¢»ñÈ¡ºòÑ¡µÄÔöÇ¿Æ÷,Èç¹ûÍ¨Öª·½·¨list¼¯ºÏÎª¿Õ£¬½øÐÐ±éÀúËùÓÐ@AspectµÈÏÈ¹Ø×¢½âµÄÀà£¬²¢½âÎö¸ÃÀàÖÐµÄÇÐÃæºÍÇÐÃæÀàÐÍÎªÒ»¸ö¸öµÄÍ¨Öª·½·¨±£´æµ½listÖÐ£¨ÇÐÃæÀïÃæµÄÍ¨Öª·½·¨£©¡¾List<Advisor> candidateAdvisors¡¿
- * 				Ã¿Ò»¸ö·â×°µÄÍ¨Öª·½·¨µÄÔöÇ¿Æ÷ÊÇ InstantiationModelAwarePointcutAdvisor£»
- * 				ÅÐ¶ÏÃ¿Ò»¸öÔöÇ¿Æ÷ÊÇ·ñÊÇ AspectJPointcutAdvisor ÀàÐÍµÄ£»·µ»Øtrue
- * 			2£©¡¢ÓÀÔ¶·µ»Øfalse
+ * AnnotationAwareAspectJAutoProxyCreatorã€InstantiationAwareBeanPostProcessorã€‘	çš„ä½œç”¨ï¼š
+ * 1ï¼‰ã€æ¯ä¸€ä¸ªbeanåˆ›å»ºä¹‹å‰ï¼Œè°ƒç”¨postProcessBeforeInstantiation()ï¼›
+ * 		å…³å¿ƒMathCalculatorå’ŒLogAspectçš„åˆ›å»º
+ * 		1ï¼‰ã€åˆ¤æ–­å½“å‰beanæ˜¯å¦åœ¨advisedBeansä¸­ï¼ˆä¿å­˜äº†æ‰€æœ‰éœ€è¦å¢žå¼ºbeanï¼‰
+ * 		2ï¼‰ã€åˆ¤æ–­å½“å‰beanæ˜¯å¦æ˜¯åŸºç¡€ç±»åž‹çš„Adviceã€Pointcutã€Advisorã€AopInfrastructureBeanï¼Œ
+ * 			æˆ–è€…æ˜¯å¦æ˜¯åˆ‡é¢ï¼ˆ@Aspectï¼‰
+ * 		3ï¼‰ã€æ˜¯å¦éœ€è¦è·³è¿‡
+ * 			1ï¼‰ã€èŽ·å–å€™é€‰çš„å¢žå¼ºå™¨,å¦‚æžœé€šçŸ¥æ–¹æ³•listé›†åˆä¸ºç©ºï¼Œè¿›è¡ŒéåŽ†æ‰€æœ‰@Aspectç­‰å…ˆå…³æ³¨è§£çš„ç±»ï¼Œå¹¶è§£æžè¯¥ç±»ä¸­çš„åˆ‡é¢å’Œåˆ‡é¢ç±»åž‹ä¸ºä¸€ä¸ªä¸ªçš„é€šçŸ¥æ–¹æ³•ä¿å­˜åˆ°listä¸­ï¼ˆåˆ‡é¢é‡Œé¢çš„é€šçŸ¥æ–¹æ³•ï¼‰ã€List<Advisor> candidateAdvisorsã€‘
+ * 				æ¯ä¸€ä¸ªå°è£…çš„é€šçŸ¥æ–¹æ³•çš„å¢žå¼ºå™¨æ˜¯ InstantiationModelAwarePointcutAdvisorï¼›
+ * 				åˆ¤æ–­æ¯ä¸€ä¸ªå¢žå¼ºå™¨æ˜¯å¦æ˜¯ AspectJPointcutAdvisor ç±»åž‹çš„ï¼›è¿”å›žtrue
+ * 			2ï¼‰ã€æ°¸è¿œè¿”å›žfalse
  * 
- * 2£©¡¢´´½¨¶ÔÏó
- * postProcessAfterInitialization£»
- * 		return wrapIfNecessary(bean, beanName, cacheKey);//°ü×°Èç¹ûÐèÒªµÄÇé¿öÏÂ
- * 		1£©¡¢»ñÈ¡µ±Ç°beanµÄËùÓÐÔöÇ¿Æ÷£¨Í¨Öª·½·¨£©  Object[]  specificInterceptors
- * 			1¡¢ÕÒµ½ºòÑ¡µÄËùÓÐµÄÔöÇ¿Æ÷£¨ÕÒÄÄÐ©Í¨Öª·½·¨ÊÇÐèÒªÇÐÈëµ±Ç°bean·½·¨µÄ£©
- * 			2¡¢»ñÈ¡µ½ÄÜÔÚbeanÊ¹ÓÃµÄÔöÇ¿Æ÷¡£
- * 			3¡¢¸øÔöÇ¿Æ÷ÅÅÐò
- * 		2£©¡¢±£´æµ±Ç°beanÔÚadvisedBeansÖÐ£»
- * 		3£©¡¢Èç¹ûµ±Ç°beanÐèÒªÔöÇ¿£¬´´½¨µ±Ç°beanµÄ´úÀí¶ÔÏó£»
- * 			1£©¡¢»ñÈ¡ËùÓÐÔöÇ¿Æ÷£¨Í¨Öª·½·¨£©
- * 			2£©¡¢±£´æµ½proxyFactory
- * 			3£©¡¢´´½¨´úÀí¶ÔÏó£ºSpring×Ô¶¯¾ö¶¨
- * 				JdkDynamicAopProxy(config);jdk¶¯Ì¬´úÀí£»
- * 				ObjenesisCglibAopProxy(config);cglibµÄ¶¯Ì¬´úÀí£»
- * 		4£©¡¢¸øÈÝÆ÷ÖÐ·µ»Øµ±Ç°×é¼þÊ¹ÓÃcglibÔöÇ¿ÁËµÄ´úÀí¶ÔÏó£»
- * 		5£©¡¢ÒÔºóÈÝÆ÷ÖÐ»ñÈ¡µ½µÄ¾ÍÊÇÕâ¸ö×é¼þµÄ´úÀí¶ÔÏó£¬Ö´ÐÐÄ¿±ê·½·¨µÄÊ±ºò£¬´úÀí¶ÔÏó¾Í»áÖ´ÐÐÍ¨Öª·½·¨µÄÁ÷³Ì£»
+ * 2ï¼‰ã€åˆ›å»ºå¯¹è±¡
+ * postProcessAfterInitializationï¼›
+ * 		return wrapIfNecessary(bean, beanName, cacheKey);//åŒ…è£…å¦‚æžœéœ€è¦çš„æƒ…å†µä¸‹
+ * 		1ï¼‰ã€èŽ·å–å½“å‰beançš„æ‰€æœ‰å¢žå¼ºå™¨ï¼ˆé€šçŸ¥æ–¹æ³•ï¼‰  Object[]  specificInterceptors
+ * 			1ã€æ‰¾åˆ°å€™é€‰çš„æ‰€æœ‰çš„å¢žå¼ºå™¨ï¼ˆæ‰¾å“ªäº›é€šçŸ¥æ–¹æ³•æ˜¯éœ€è¦åˆ‡å…¥å½“å‰beanæ–¹æ³•çš„ï¼‰
+ * 			2ã€èŽ·å–åˆ°èƒ½åœ¨beanä½¿ç”¨çš„å¢žå¼ºå™¨ã€‚
+ * 			3ã€ç»™å¢žå¼ºå™¨æŽ’åº
+ * 		2ï¼‰ã€ä¿å­˜å½“å‰beanåœ¨advisedBeansä¸­ï¼›
+ * 		3ï¼‰ã€å¦‚æžœå½“å‰beanéœ€è¦å¢žå¼ºï¼Œåˆ›å»ºå½“å‰beançš„ä»£ç†å¯¹è±¡ï¼›
+ * 			1ï¼‰ã€èŽ·å–æ‰€æœ‰å¢žå¼ºå™¨ï¼ˆé€šçŸ¥æ–¹æ³•ï¼‰
+ * 			2ï¼‰ã€ä¿å­˜åˆ°proxyFactory
+ * 			3ï¼‰ã€åˆ›å»ºä»£ç†å¯¹è±¡ï¼šSpringè‡ªåŠ¨å†³å®š
+ * 				JdkDynamicAopProxy(config);jdkåŠ¨æ€ä»£ç†ï¼›
+ * 				ObjenesisCglibAopProxy(config);cglibçš„åŠ¨æ€ä»£ç†ï¼›
+ * 		4ï¼‰ã€ç»™å®¹å™¨ä¸­è¿”å›žå½“å‰ç»„ä»¶ä½¿ç”¨cglibå¢žå¼ºäº†çš„ä»£ç†å¯¹è±¡ï¼›
+ * 		5ï¼‰ã€ä»¥åŽå®¹å™¨ä¸­èŽ·å–åˆ°çš„å°±æ˜¯è¿™ä¸ªç»„ä»¶çš„ä»£ç†å¯¹è±¡ï¼Œæ‰§è¡Œç›®æ ‡æ–¹æ³•çš„æ—¶å€™ï¼Œä»£ç†å¯¹è±¡å°±ä¼šæ‰§è¡Œé€šçŸ¥æ–¹æ³•çš„æµç¨‹ï¼›
  * 		
  * 	
- * 	3£©¡¢Ä¿±ê·½·¨Ö´ÐÐ	£»
- * 		ÈÝÆ÷ÖÐ±£´æÁË×é¼þµÄ´úÀí¶ÔÏó£¨cglibÔöÇ¿ºóµÄ¶ÔÏó£©£¬Õâ¸ö¶ÔÏóÀïÃæ±£´æÁËÏêÏ¸ÐÅÏ¢£¨±ÈÈçÔöÇ¿Æ÷£¬Ä¿±ê¶ÔÏó£¬xxx£©£»
- * 		1£©¡¢CglibAopProxy.intercept();À¹½ØÄ¿±ê·½·¨µÄÖ´ÐÐ
- * 		2£©¡¢¸ù¾ÝProxyFactory¶ÔÏó»ñÈ¡½«ÒªÖ´ÐÐµÄÄ¿±ê·½·¨À¹½ØÆ÷Á´£»
+ * 	3ï¼‰ã€ç›®æ ‡æ–¹æ³•æ‰§è¡Œ	ï¼›
+ * 		å®¹å™¨ä¸­ä¿å­˜äº†ç»„ä»¶çš„ä»£ç†å¯¹è±¡ï¼ˆcglibå¢žå¼ºåŽçš„å¯¹è±¡ï¼‰ï¼Œè¿™ä¸ªå¯¹è±¡é‡Œé¢ä¿å­˜äº†è¯¦ç»†ä¿¡æ¯ï¼ˆæ¯”å¦‚å¢žå¼ºå™¨ï¼Œç›®æ ‡å¯¹è±¡ï¼Œxxxï¼‰ï¼›
+ * 		1ï¼‰ã€CglibAopProxy.intercept();æ‹¦æˆªç›®æ ‡æ–¹æ³•çš„æ‰§è¡Œ
+ * 		2ï¼‰ã€æ ¹æ®ProxyFactoryå¯¹è±¡èŽ·å–å°†è¦æ‰§è¡Œçš„ç›®æ ‡æ–¹æ³•æ‹¦æˆªå™¨é“¾ï¼›
  * 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
- * 			1£©¡¢List<Object> interceptorList±£´æËùÓÐÀ¹½ØÆ÷ 5
- * 				Ò»¸öÄ¬ÈÏµÄExposeInvocationInterceptor ºÍ 4¸öÔöÇ¿Æ÷£»
- * 			2£©¡¢±éÀúËùÓÐµÄÔöÇ¿Æ÷£¬½«Æä×ªÎªInterceptor£»
+ * 			1ï¼‰ã€List<Object> interceptorListä¿å­˜æ‰€æœ‰æ‹¦æˆªå™¨ 5
+ * 				ä¸€ä¸ªé»˜è®¤çš„ExposeInvocationInterceptor å’Œ 4ä¸ªå¢žå¼ºå™¨ï¼›
+ * 			2ï¼‰ã€éåŽ†æ‰€æœ‰çš„å¢žå¼ºå™¨ï¼Œå°†å…¶è½¬ä¸ºInterceptorï¼›
  * 				registry.getInterceptors(advisor);
- * 			3£©¡¢½«ÔöÇ¿Æ÷×ªÎªList<MethodInterceptor>£»
- * 				Èç¹ûÊÇMethodInterceptor£¬Ö±½Ó¼ÓÈëµ½¼¯ºÏÖÐ
- * 				Èç¹û²»ÊÇ£¬Ê¹ÓÃAdvisorAdapter½«ÔöÇ¿Æ÷×ªÎªMethodInterceptor£»
- * 				×ª»»Íê³É·µ»ØMethodInterceptorÊý×é£»
+ * 			3ï¼‰ã€å°†å¢žå¼ºå™¨è½¬ä¸ºList<MethodInterceptor>ï¼›
+ * 				å¦‚æžœæ˜¯MethodInterceptorï¼Œç›´æŽ¥åŠ å…¥åˆ°é›†åˆä¸­
+ * 				å¦‚æžœä¸æ˜¯ï¼Œä½¿ç”¨AdvisorAdapterå°†å¢žå¼ºå™¨è½¬ä¸ºMethodInterceptorï¼›
+ * 				è½¬æ¢å®Œæˆè¿”å›žMethodInterceptoræ•°ç»„ï¼›
  * 
- * 		3£©¡¢Èç¹ûÃ»ÓÐÀ¹½ØÆ÷Á´£¬Ö±½ÓÖ´ÐÐÄ¿±ê·½·¨;
- * 			À¹½ØÆ÷Á´£¨Ã¿Ò»¸öÍ¨Öª·½·¨ÓÖ±»°ü×°Îª·½·¨À¹½ØÆ÷£¬ÀûÓÃMethodInterceptor»úÖÆ£©
- * 		4£©¡¢Èç¹ûÓÐÀ¹½ØÆ÷Á´£¬°ÑÐèÒªÖ´ÐÐµÄÄ¿±ê¶ÔÏó£¬Ä¿±ê·½·¨£¬
- * 			À¹½ØÆ÷Á´µÈÐÅÏ¢´«Èë´´½¨Ò»¸ö CglibMethodInvocation ¶ÔÏó£¬
- * 			²¢µ÷ÓÃ Object retVal =  mi.proceed();
- * 		5£©¡¢À¹½ØÆ÷Á´µÄ´¥·¢¹ý³Ì;
- * 			1)¡¢Èç¹ûÃ»ÓÐÀ¹½ØÆ÷Ö´ÐÐÖ´ÐÐÄ¿±ê·½·¨£¬»òÕßÀ¹½ØÆ÷µÄË÷ÒýºÍÀ¹½ØÆ÷Êý×é-1´óÐ¡Ò»Ñù£¨Ö¸¶¨µ½ÁË×îºóÒ»¸öÀ¹½ØÆ÷£©Ö´ÐÐÄ¿±ê·½·¨£»
- * 			2)¡¢Á´Ê½»ñÈ¡Ã¿Ò»¸öÀ¹½ØÆ÷£¬À¹½ØÆ÷Ö´ÐÐinvoke·½·¨£¬Ã¿Ò»¸öÀ¹½ØÆ÷µÈ´ýÏÂÒ»¸öÀ¹½ØÆ÷Ö´ÐÐÍê³É·µ»ØÒÔºóÔÙÀ´Ö´ÐÐ£»
- * 				À¹½ØÆ÷Á´µÄ»úÖÆ£¬±£Ö¤Í¨Öª·½·¨ÓëÄ¿±ê·½·¨µÄÖ´ÐÐË³Ðò£»
+ * 		3ï¼‰ã€å¦‚æžœæ²¡æœ‰æ‹¦æˆªå™¨é“¾ï¼Œç›´æŽ¥æ‰§è¡Œç›®æ ‡æ–¹æ³•;
+ * 			æ‹¦æˆªå™¨é“¾ï¼ˆæ¯ä¸€ä¸ªé€šçŸ¥æ–¹æ³•åˆè¢«åŒ…è£…ä¸ºæ–¹æ³•æ‹¦æˆªå™¨ï¼Œåˆ©ç”¨MethodInterceptoræœºåˆ¶ï¼‰
+ * 		4ï¼‰ã€å¦‚æžœæœ‰æ‹¦æˆªå™¨é“¾ï¼ŒæŠŠéœ€è¦æ‰§è¡Œçš„ç›®æ ‡å¯¹è±¡ï¼Œç›®æ ‡æ–¹æ³•ï¼Œ
+ * 			æ‹¦æˆªå™¨é“¾ç­‰ä¿¡æ¯ä¼ å…¥åˆ›å»ºä¸€ä¸ª CglibMethodInvocation å¯¹è±¡ï¼Œ
+ * 			å¹¶è°ƒç”¨ Object retVal =  mi.proceed();
+ * 		5ï¼‰ã€æ‹¦æˆªå™¨é“¾çš„è§¦å‘è¿‡ç¨‹;
+ * 			1)ã€å¦‚æžœæ²¡æœ‰æ‹¦æˆªå™¨æ‰§è¡Œæ‰§è¡Œç›®æ ‡æ–¹æ³•ï¼Œæˆ–è€…æ‹¦æˆªå™¨çš„ç´¢å¼•å’Œæ‹¦æˆªå™¨æ•°ç»„-1å¤§å°ä¸€æ ·ï¼ˆæŒ‡å®šåˆ°äº†æœ€åŽä¸€ä¸ªæ‹¦æˆªå™¨ï¼‰æ‰§è¡Œç›®æ ‡æ–¹æ³•ï¼›
+ * 			2)ã€é“¾å¼èŽ·å–æ¯ä¸€ä¸ªæ‹¦æˆªå™¨ï¼Œæ‹¦æˆªå™¨æ‰§è¡Œinvokeæ–¹æ³•ï¼Œæ¯ä¸€ä¸ªæ‹¦æˆªå™¨ç­‰å¾…ä¸‹ä¸€ä¸ªæ‹¦æˆªå™¨æ‰§è¡Œå®Œæˆè¿”å›žä»¥åŽå†æ¥æ‰§è¡Œï¼›
+ * 				æ‹¦æˆªå™¨é“¾çš„æœºåˆ¶ï¼Œä¿è¯é€šçŸ¥æ–¹æ³•ä¸Žç›®æ ‡æ–¹æ³•çš„æ‰§è¡Œé¡ºåºï¼›
  * 		
- * 	×Ü½á£º
- * 		1£©¡¢  @EnableAspectJAutoProxy ¿ªÆôAOP¹¦ÄÜ
- * 		2£©¡¢ @EnableAspectJAutoProxy »á¸øÈÝÆ÷ÖÐ×¢²áÒ»¸ö×é¼þ AnnotationAwareAspectJAutoProxyCreator
- * 		3£©¡¢AnnotationAwareAspectJAutoProxyCreatorÊÇÒ»¸öºóÖÃ´¦ÀíÆ÷£»
- * 		4£©¡¢ÈÝÆ÷µÄ´´½¨Á÷³Ì£º
- * 			1£©¡¢registerBeanPostProcessors£¨£©×¢²áºóÖÃ´¦ÀíÆ÷£»´´½¨AnnotationAwareAspectJAutoProxyCreator¶ÔÏó
- * 			2£©¡¢finishBeanFactoryInitialization£¨£©³õÊ¼»¯Ê£ÏÂµÄµ¥ÊµÀýbean
- * 				1£©¡¢´´½¨ÒµÎñÂß¼­×é¼þºÍÇÐÃæ×é¼þ
- * 				2£©¡¢AnnotationAwareAspectJAutoProxyCreatorÀ¹½Ø×é¼þµÄ´´½¨¹ý³Ì
- * 				3£©¡¢×é¼þ´´½¨ÍêÖ®ºó£¬ÅÐ¶Ï×é¼þÊÇ·ñÐèÒªÔöÇ¿
- * 					ÊÇ£ºÇÐÃæµÄÍ¨Öª·½·¨£¬°ü×°³ÉÔöÇ¿Æ÷£¨Advisor£©;¸øÒµÎñÂß¼­×é¼þ´´½¨Ò»¸ö´úÀí¶ÔÏó£¨cglib£©£»
- * 		5£©¡¢Ö´ÐÐÄ¿±ê·½·¨£º
- * 			1£©¡¢´úÀí¶ÔÏóÖ´ÐÐÄ¿±ê·½·¨
- * 			2£©¡¢CglibAopProxy.intercept()£»
- * 				1£©¡¢µÃµ½Ä¿±ê·½·¨µÄÀ¹½ØÆ÷Á´£¨ÔöÇ¿Æ÷°ü×°³ÉÀ¹½ØÆ÷MethodInterceptor£©
- * 				2£©¡¢ÀûÓÃÀ¹½ØÆ÷µÄÁ´Ê½»úÖÆ£¬ÒÀ´Î½øÈëÃ¿Ò»¸öÀ¹½ØÆ÷½øÐÐÖ´ÐÐ£»
- * 				3£©¡¢Ð§¹û£º
- * 					Õý³£Ö´ÐÐ£ºÇ°ÖÃÍ¨Öª-¡·Ä¿±ê·½·¨-¡·ºóÖÃÍ¨Öª-¡··µ»ØÍ¨Öª
- * 					³öÏÖÒì³££ºÇ°ÖÃÍ¨Öª-¡·Ä¿±ê·½·¨-¡·ºóÖÃÍ¨Öª-¡·Òì³£Í¨Öª
+ * 	æ€»ç»“ï¼š
+ * 		1ï¼‰ã€  @EnableAspectJAutoProxy å¼€å¯AOPåŠŸèƒ½
+ * 		2ï¼‰ã€ @EnableAspectJAutoProxy ä¼šç»™å®¹å™¨ä¸­æ³¨å†Œä¸€ä¸ªç»„ä»¶ AnnotationAwareAspectJAutoProxyCreator
+ * 		3ï¼‰ã€AnnotationAwareAspectJAutoProxyCreatoræ˜¯ä¸€ä¸ªåŽç½®å¤„ç†å™¨ï¼›
+ * 		4ï¼‰ã€å®¹å™¨çš„åˆ›å»ºæµç¨‹ï¼š
+ * 			1ï¼‰ã€registerBeanPostProcessorsï¼ˆï¼‰æ³¨å†ŒåŽç½®å¤„ç†å™¨ï¼›åˆ›å»ºAnnotationAwareAspectJAutoProxyCreatorå¯¹è±¡
+ * 			2ï¼‰ã€finishBeanFactoryInitializationï¼ˆï¼‰åˆå§‹åŒ–å‰©ä¸‹çš„å•å®žä¾‹bean
+ * 				1ï¼‰ã€åˆ›å»ºä¸šåŠ¡é€»è¾‘ç»„ä»¶å’Œåˆ‡é¢ç»„ä»¶
+ * 				2ï¼‰ã€AnnotationAwareAspectJAutoProxyCreatoræ‹¦æˆªç»„ä»¶çš„åˆ›å»ºè¿‡ç¨‹
+ * 				3ï¼‰ã€ç»„ä»¶åˆ›å»ºå®Œä¹‹åŽï¼Œåˆ¤æ–­ç»„ä»¶æ˜¯å¦éœ€è¦å¢žå¼º
+ * 					æ˜¯ï¼šåˆ‡é¢çš„é€šçŸ¥æ–¹æ³•ï¼ŒåŒ…è£…æˆå¢žå¼ºå™¨ï¼ˆAdvisorï¼‰;ç»™ä¸šåŠ¡é€»è¾‘ç»„ä»¶åˆ›å»ºä¸€ä¸ªä»£ç†å¯¹è±¡ï¼ˆcglibï¼‰ï¼›
+ * 		5ï¼‰ã€æ‰§è¡Œç›®æ ‡æ–¹æ³•ï¼š
+ * 			1ï¼‰ã€ä»£ç†å¯¹è±¡æ‰§è¡Œç›®æ ‡æ–¹æ³•
+ * 			2ï¼‰ã€CglibAopProxy.intercept()ï¼›
+ * 				1ï¼‰ã€å¾—åˆ°ç›®æ ‡æ–¹æ³•çš„æ‹¦æˆªå™¨é“¾ï¼ˆå¢žå¼ºå™¨åŒ…è£…æˆæ‹¦æˆªå™¨MethodInterceptorï¼‰
+ * 				2ï¼‰ã€åˆ©ç”¨æ‹¦æˆªå™¨çš„é“¾å¼æœºåˆ¶ï¼Œä¾æ¬¡è¿›å…¥æ¯ä¸€ä¸ªæ‹¦æˆªå™¨è¿›è¡Œæ‰§è¡Œï¼›
+ * 				3ï¼‰ã€æ•ˆæžœï¼š
+ * 					æ­£å¸¸æ‰§è¡Œï¼šå‰ç½®é€šçŸ¥-ã€‹ç›®æ ‡æ–¹æ³•-ã€‹åŽç½®é€šçŸ¥-ã€‹è¿”å›žé€šçŸ¥
+ * 					å‡ºçŽ°å¼‚å¸¸ï¼šå‰ç½®é€šçŸ¥-ã€‹ç›®æ ‡æ–¹æ³•-ã€‹åŽç½®é€šçŸ¥-ã€‹å¼‚å¸¸é€šçŸ¥
  * 		
  * 
  * 
@@ -192,7 +192,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configuration
 public class MainConfigOfAOP {
 	 
-	//ÒµÎñÂß¼­Àà¼ÓÈëÈÝÆ÷ÖÐ
+	//ä¸šåŠ¡é€»è¾‘ç±»åŠ å…¥å®¹å™¨ä¸­
 	@Bean
 	public MathCalculator calculator(){
 		return new MathCalculator();
@@ -202,7 +202,7 @@ public class MainConfigOfAOP {
 		return new MathCalculator2();
 	}
 
-	//ÇÐÃæÀà¼ÓÈëµ½ÈÝÆ÷ÖÐ
+	//åˆ‡é¢ç±»åŠ å…¥åˆ°å®¹å™¨ä¸­
 	@Bean
 	public LogAspects logAspects(){
 		return new LogAspects();

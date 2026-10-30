@@ -21,46 +21,46 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 /**
- * ÉùÃ÷Ê½ÊÂÎñ£º
+ * å£°æ˜å¼äº‹åŠ¡ï¼š
  * 
- * »·¾³´î½¨£º
- * 1¡¢µ¼ÈëÏà¹ØÒÀÀµ
- * 		Êı¾İÔ´¡¢Êı¾İ¿âÇı¶¯¡¢Spring-jdbcÄ£¿é
- * 2¡¢ÅäÖÃÊı¾İÔ´¡¢JdbcTemplate£¨SpringÌá¹©µÄ¼ò»¯Êı¾İ¿â²Ù×÷µÄ¹¤¾ß£©²Ù×÷Êı¾İ
- * 3¡¢¸ø·½·¨ÉÏ±ê×¢ @Transactional ±íÊ¾µ±Ç°·½·¨ÊÇÒ»¸öÊÂÎñ·½·¨£»
- * 4¡¢ @EnableTransactionManagement ¿ªÆô»ùÓÚ×¢½âµÄÊÂÎñ¹ÜÀí¹¦ÄÜ£»
+ * ç¯å¢ƒæ­å»ºï¼š
+ * 1ã€å¯¼å…¥ç›¸å…³ä¾èµ–
+ * 		æ•°æ®æºã€æ•°æ®åº“é©±åŠ¨ã€Spring-jdbcæ¨¡å—
+ * 2ã€é…ç½®æ•°æ®æºã€JdbcTemplateï¼ˆSpringæä¾›çš„ç®€åŒ–æ•°æ®åº“æ“ä½œçš„å·¥å…·ï¼‰æ“ä½œæ•°æ®
+ * 3ã€ç»™æ–¹æ³•ä¸Šæ ‡æ³¨ @Transactional è¡¨ç¤ºå½“å‰æ–¹æ³•æ˜¯ä¸€ä¸ªäº‹åŠ¡æ–¹æ³•ï¼›
+ * 4ã€ @EnableTransactionManagement å¼€å¯åŸºäºæ³¨è§£çš„äº‹åŠ¡ç®¡ç†åŠŸèƒ½ï¼›
  * 		@EnableXXX
- * 5¡¢ÅäÖÃÊÂÎñ¹ÜÀíÆ÷À´¿ØÖÆÊÂÎñ;
+ * 5ã€é…ç½®äº‹åŠ¡ç®¡ç†å™¨æ¥æ§åˆ¶äº‹åŠ¡;
  * 		@Bean
  * 		public PlatformTransactionManager transactionManager()
  * 
  * 
- * Ô­Àí£º
- * 1£©¡¢@EnableTransactionManagement
- * 			ÀûÓÃTransactionManagementConfigurationSelector¸øÈİÆ÷ÖĞ»áµ¼Èë×é¼ş
- * 			µ¼ÈëÁ½¸ö×é¼ş
+ * åŸç†ï¼š
+ * 1ï¼‰ã€@EnableTransactionManagement
+ * 			åˆ©ç”¨TransactionManagementConfigurationSelectorç»™å®¹å™¨ä¸­ä¼šå¯¼å…¥ç»„ä»¶
+ * 			å¯¼å…¥ä¸¤ä¸ªç»„ä»¶
  * 			AutoProxyRegistrar
  * 			ProxyTransactionManagementConfiguration
- * 2£©¡¢AutoProxyRegistrar£º
- * 			¸øÈİÆ÷ÖĞ×¢²áÒ»¸ö InfrastructureAdvisorAutoProxyCreator ×é¼ş£»
- * 			InfrastructureAdvisorAutoProxyCreator£º£¿
- * 			ÀûÓÃºóÖÃ´¦ÀíÆ÷»úÖÆÔÚ¶ÔÏó´´½¨ÒÔºó£¬°ü×°¶ÔÏó£¬·µ»ØÒ»¸ö´úÀí¶ÔÏó£¨ÔöÇ¿Æ÷£©£¬´úÀí¶ÔÏóÖ´ĞĞ·½·¨ÀûÓÃÀ¹½ØÆ÷Á´½øĞĞµ÷ÓÃ£»
+ * 2ï¼‰ã€AutoProxyRegistrarï¼š
+ * 			ç»™å®¹å™¨ä¸­æ³¨å†Œä¸€ä¸ª InfrastructureAdvisorAutoProxyCreator ç»„ä»¶ï¼›
+ * 			InfrastructureAdvisorAutoProxyCreatorï¼šï¼Ÿ
+ * 			åˆ©ç”¨åç½®å¤„ç†å™¨æœºåˆ¶åœ¨å¯¹è±¡åˆ›å»ºä»¥åï¼ŒåŒ…è£…å¯¹è±¡ï¼Œè¿”å›ä¸€ä¸ªä»£ç†å¯¹è±¡ï¼ˆå¢å¼ºå™¨ï¼‰ï¼Œä»£ç†å¯¹è±¡æ‰§è¡Œæ–¹æ³•åˆ©ç”¨æ‹¦æˆªå™¨é“¾è¿›è¡Œè°ƒç”¨ï¼›
  * 
- * 3£©¡¢ProxyTransactionManagementConfiguration ×öÁËÊ²Ã´£¿
- * 			1¡¢¸øÈİÆ÷ÖĞ×¢²áÊÂÎñÔöÇ¿Æ÷£»
- * 				1£©¡¢ÊÂÎñÔöÇ¿Æ÷ÒªÓÃÊÂÎñ×¢½âµÄĞÅÏ¢£¬AnnotationTransactionAttributeSource½âÎöÊÂÎñ×¢½â
- * 				2£©¡¢ÊÂÎñÀ¹½ØÆ÷£º
- * 					TransactionInterceptor£»±£´æÁËÊÂÎñÊôĞÔĞÅÏ¢£¬ÊÂÎñ¹ÜÀíÆ÷£»
- * 					ËûÊÇÒ»¸ö MethodInterceptor£»
- * 					ÔÚÄ¿±ê·½·¨Ö´ĞĞµÄÊ±ºò£»
- * 						Ö´ĞĞÀ¹½ØÆ÷Á´£»
- * 						ÊÂÎñÀ¹½ØÆ÷£º
- * 							1£©¡¢ÏÈ»ñÈ¡ÊÂÎñÏà¹ØµÄÊôĞÔ
- * 							2£©¡¢ÔÙ»ñÈ¡PlatformTransactionManager£¬Èç¹ûÊÂÏÈÃ»ÓĞÌí¼ÓÖ¸¶¨ÈÎºÎtransactionmanger
- * 								×îÖÕ»á´ÓÈİÆ÷ÖĞ°´ÕÕÀàĞÍ»ñÈ¡Ò»¸öPlatformTransactionManager£»
- * 							3£©¡¢Ö´ĞĞÄ¿±ê·½·¨
- * 								Èç¹ûÒì³££¬»ñÈ¡µ½ÊÂÎñ¹ÜÀíÆ÷£¬ÀûÓÃÊÂÎñ¹ÜÀí»Ø¹ö²Ù×÷£»
- * 								Èç¹ûÕı³££¬ÀûÓÃÊÂÎñ¹ÜÀíÆ÷£¬Ìá½»ÊÂÎñ
+ * 3ï¼‰ã€ProxyTransactionManagementConfiguration åšäº†ä»€ä¹ˆï¼Ÿ
+ * 			1ã€ç»™å®¹å™¨ä¸­æ³¨å†Œäº‹åŠ¡å¢å¼ºå™¨ï¼›
+ * 				1ï¼‰ã€äº‹åŠ¡å¢å¼ºå™¨è¦ç”¨äº‹åŠ¡æ³¨è§£çš„ä¿¡æ¯ï¼ŒAnnotationTransactionAttributeSourceè§£æäº‹åŠ¡æ³¨è§£
+ * 				2ï¼‰ã€äº‹åŠ¡æ‹¦æˆªå™¨ï¼š
+ * 					TransactionInterceptorï¼›ä¿å­˜äº†äº‹åŠ¡å±æ€§ä¿¡æ¯ï¼Œäº‹åŠ¡ç®¡ç†å™¨ï¼›
+ * 					ä»–æ˜¯ä¸€ä¸ª MethodInterceptorï¼›
+ * 					åœ¨ç›®æ ‡æ–¹æ³•æ‰§è¡Œçš„æ—¶å€™ï¼›
+ * 						æ‰§è¡Œæ‹¦æˆªå™¨é“¾ï¼›
+ * 						äº‹åŠ¡æ‹¦æˆªå™¨ï¼š
+ * 							1ï¼‰ã€å…ˆè·å–äº‹åŠ¡ç›¸å…³çš„å±æ€§
+ * 							2ï¼‰ã€å†è·å–PlatformTransactionManagerï¼Œå¦‚æœäº‹å…ˆæ²¡æœ‰æ·»åŠ æŒ‡å®šä»»ä½•transactionmanger
+ * 								æœ€ç»ˆä¼šä»å®¹å™¨ä¸­æŒ‰ç…§ç±»å‹è·å–ä¸€ä¸ªPlatformTransactionManagerï¼›
+ * 							3ï¼‰ã€æ‰§è¡Œç›®æ ‡æ–¹æ³•
+ * 								å¦‚æœå¼‚å¸¸ï¼Œè·å–åˆ°äº‹åŠ¡ç®¡ç†å™¨ï¼Œåˆ©ç”¨äº‹åŠ¡ç®¡ç†å›æ»šæ“ä½œï¼›
+ * 								å¦‚æœæ­£å¸¸ï¼Œåˆ©ç”¨äº‹åŠ¡ç®¡ç†å™¨ï¼Œæäº¤äº‹åŠ¡
  * 			
  */
 @EnableTransactionManagement
@@ -68,7 +68,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 @Configuration
 public class TxConfig {
 	
-	//Êı¾İÔ´
+	//æ•°æ®æº
 	@Bean
 	public DataSource dataSource() throws Exception{
 		ComboPooledDataSource dataSource = new ComboPooledDataSource();
@@ -82,12 +82,12 @@ public class TxConfig {
 	//
 	@Bean
 	public JdbcTemplate jdbcTemplate() throws Exception{
-		//Spring¶Ô@ConfigurationÀà»áÌØÊâ´¦Àí£»¸øÈİÆ÷ÖĞ¼Ó×é¼şµÄ·½·¨£¬¶à´Îµ÷ÓÃ¶¼Ö»ÊÇ´ÓÈİÆ÷ÖĞÕÒ×é¼ş
+		//Springå¯¹@Configurationç±»ä¼šç‰¹æ®Šå¤„ç†ï¼›ç»™å®¹å™¨ä¸­åŠ ç»„ä»¶çš„æ–¹æ³•ï¼Œå¤šæ¬¡è°ƒç”¨éƒ½åªæ˜¯ä»å®¹å™¨ä¸­æ‰¾ç»„ä»¶
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource());
 		return jdbcTemplate;
 	}
 	
-	//×¢²áÊÂÎñ¹ÜÀíÆ÷ÔÚÈİÆ÷ÖĞ
+	//æ³¨å†Œäº‹åŠ¡ç®¡ç†å™¨åœ¨å®¹å™¨ä¸­
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception{
 		return new DataSourceTransactionManager(dataSource());

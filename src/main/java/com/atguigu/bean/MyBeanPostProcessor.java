@@ -5,8 +5,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 /**
- * ºóÖÃ´¦ÀíÆ÷£º³õÊ¼»¯Ç°ºó½øĞĞ´¦Àí¹¤×÷
- * ½«ºóÖÃ´¦ÀíÆ÷¼ÓÈëµ½ÈİÆ÷ÖĞ
+ * åç½®å¤„ç†å™¨ï¼šåˆå§‹åŒ–å‰åè¿›è¡Œå¤„ç†å·¥ä½œ
+ * å°†åç½®å¤„ç†å™¨åŠ å…¥åˆ°å®¹å™¨ä¸­
  * @author lfy
  */
 @Component

@@ -16,21 +16,21 @@ public class Red implements ApplicationContextAware,BeanNameAware,EmbeddedValueR
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		// TODO Auto-generated method stub
-		System.out.println("´«ÈëµÄioc£º"+applicationContext);
+		System.out.println("ä¼ å…¥çš„iocï¼š"+applicationContext);
 		this.applicationContext = applicationContext;
 	}
 
 	@Override
 	public void setBeanName(String name) {
 		// TODO Auto-generated method stub
-		System.out.println("µ±Ç°beanµÄÃû×Ö£º"+name);
+		System.out.println("å½“å‰beançš„åå­—ï¼š"+name);
 	}
 
 	@Override
 	public void setEmbeddedValueResolver(StringValueResolver resolver) {
 		// TODO Auto-generated method stub
-		String resolveStringValue = resolver.resolveStringValue("ÄãºÃ ${os.name} ÎÒÊÇ #{20*18}");
-		System.out.println("½âÎöµÄ×Ö·û´®£º"+resolveStringValue);
+		String resolveStringValue = resolver.resolveStringValue("ä½ å¥½ ${os.name} æˆ‘æ˜¯ #{20*18}");
+		System.out.println("è§£æçš„å­—ç¬¦ä¸²ï¼š"+resolveStringValue);
 	}
 
 

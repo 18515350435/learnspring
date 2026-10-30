@@ -3,16 +3,16 @@ package com.atguigu.condition;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 
-//×Ô¶¨ÒåÂß¼­·µ»ØĞèÒªµ¼ÈëµÄ×é¼ş
+//è‡ªå®šä¹‰é€»è¾‘è¿”å›éœ€è¦å¯¼å…¥çš„ç»„ä»¶
 public class MyImportSelector implements ImportSelector {
 
-	//·µ»ØÖµ£¬¾ÍÊÇµ½µ¼Èëµ½ÈİÆ÷ÖĞµÄ×é¼şÈ«ÀàÃû
-	//AnnotationMetadata:µ±Ç°±ê×¢@Import×¢½âµÄÀàµÄËùÓĞ×¢½âĞÅÏ¢
+	//è¿”å›å€¼ï¼Œå°±æ˜¯åˆ°å¯¼å…¥åˆ°å®¹å™¨ä¸­çš„ç»„ä»¶å…¨ç±»å
+	//AnnotationMetadata:å½“å‰æ ‡æ³¨@Importæ³¨è§£çš„ç±»çš„æ‰€æœ‰æ³¨è§£ä¿¡æ¯
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {
 		// TODO Auto-generated method stub
 		//importingClassMetadata
-		//·½·¨²»Òª·µ»ØnullÖµ
+		//æ–¹æ³•ä¸è¦è¿”å›nullå€¼
 		return new String[]{"com.atguigu.bean.Blue","com.atguigu.bean.Yellow"};
 	}
 

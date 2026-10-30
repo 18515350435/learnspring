@@ -17,18 +17,18 @@ import com.atguigu.service.BookService;
 
 public class IOCTest_Profile {
 	
-	//1¡¢Ê¹ÓÃÃüÁîĞĞ¶¯Ì¬²ÎÊı: ÔÚĞéÄâ»ú²ÎÊıÎ»ÖÃ¼ÓÔØ -Dspring.profiles.active=test
-	//2¡¢´úÂëµÄ·½Ê½¼¤»îÄ³ÖÖ»·¾³£»
+	//1ã€ä½¿ç”¨å‘½ä»¤è¡ŒåŠ¨æ€å‚æ•°: åœ¨è™šæ‹Ÿæœºå‚æ•°ä½ç½®åŠ è½½ -Dspring.profiles.active=test
+	//2ã€ä»£ç çš„æ–¹å¼æ¿€æ´»æŸç§ç¯å¢ƒï¼›
 	@Test
 	public void test01(){
 		AnnotationConfigApplicationContext applicationContext = 
 				new AnnotationConfigApplicationContext();
-		//1¡¢´´½¨Ò»¸öapplicationContext
-		//2¡¢ÉèÖÃĞèÒª¼¤»îµÄ»·¾³
+		//1ã€åˆ›å»ºä¸€ä¸ªapplicationContext
+		//2ã€è®¾ç½®éœ€è¦æ¿€æ´»çš„ç¯å¢ƒ
 		applicationContext.getEnvironment().setActiveProfiles("dev");
-		//3¡¢×¢²áÖ÷ÅäÖÃÀà
+		//3ã€æ³¨å†Œä¸»é…ç½®ç±»
 		applicationContext.register(MainConfigOfProfile.class);
-		//4¡¢Æô¶¯Ë¢ĞÂÈİÆ÷
+		//4ã€å¯åŠ¨åˆ·æ–°å®¹å™¨
 		applicationContext.refresh();
 		
 		

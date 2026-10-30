@@ -9,52 +9,52 @@ import org.springframework.context.annotation.Scope;
 import com.atguigu.bean.Car;
 
 /**
- * beanµÄÉúÃüÖÜÆÚ£º
- * 		bean´´½¨---³õÊ¼»¯----Ïú»ÙµÄ¹ı³Ì
- * ÈİÆ÷¹ÜÀíbeanµÄÉúÃüÖÜÆÚ£»
- * ÎÒÃÇ¿ÉÒÔ×Ô¶¨Òå³õÊ¼»¯ºÍÏú»Ù·½·¨£»ÈİÆ÷ÔÚbean½øĞĞµ½µ±Ç°ÉúÃüÖÜÆÚµÄÊ±ºòÀ´µ÷ÓÃÎÒÃÇ×Ô¶¨ÒåµÄ³õÊ¼»¯ºÍÏú»Ù·½·¨
+ * beançš„ç”Ÿå‘½å‘¨æœŸï¼š
+ * 		beanåˆ›å»º---åˆå§‹åŒ–----é”€æ¯çš„è¿‡ç¨‹
+ * å®¹å™¨ç®¡ç†beançš„ç”Ÿå‘½å‘¨æœŸï¼›
+ * æˆ‘ä»¬å¯ä»¥è‡ªå®šä¹‰åˆå§‹åŒ–å’Œé”€æ¯æ–¹æ³•ï¼›å®¹å™¨åœ¨beanè¿›è¡Œåˆ°å½“å‰ç”Ÿå‘½å‘¨æœŸçš„æ—¶å€™æ¥è°ƒç”¨æˆ‘ä»¬è‡ªå®šä¹‰çš„åˆå§‹åŒ–å’Œé”€æ¯æ–¹æ³•
  * 
- * ¹¹Ôì£¨¶ÔÏó´´½¨£©
- * 		µ¥ÊµÀı£ºÔÚÈİÆ÷Æô¶¯µÄÊ±ºò´´½¨¶ÔÏó
- * 		¶àÊµÀı£ºÔÚÃ¿´Î»ñÈ¡µÄÊ±ºò´´½¨¶ÔÏó\
+ * æ„é€ ï¼ˆå¯¹è±¡åˆ›å»ºï¼‰
+ * 		å•å®ä¾‹ï¼šåœ¨å®¹å™¨å¯åŠ¨çš„æ—¶å€™åˆ›å»ºå¯¹è±¡
+ * 		å¤šå®ä¾‹ï¼šåœ¨æ¯æ¬¡è·å–çš„æ—¶å€™åˆ›å»ºå¯¹è±¡\
  * 
  * BeanPostProcessor.postProcessBeforeInitialization
- * ³õÊ¼»¯£º
- * 		¶ÔÏó´´½¨Íê³É£¬²¢¸³ÖµºÃ£¬µ÷ÓÃ³õÊ¼»¯·½·¨¡£¡£¡£
+ * åˆå§‹åŒ–ï¼š
+ * 		å¯¹è±¡åˆ›å»ºå®Œæˆï¼Œå¹¶èµ‹å€¼å¥½ï¼Œè°ƒç”¨åˆå§‹åŒ–æ–¹æ³•ã€‚ã€‚ã€‚
  * BeanPostProcessor.postProcessAfterInitialization
- * Ïú»Ù£º
- * 		µ¥ÊµÀı£ºÈİÆ÷¹Ø±ÕµÄÊ±ºò
- * 		¶àÊµÀı£ºÈİÆ÷²»»á¹ÜÀíÕâ¸öbean£»ÈİÆ÷²»»áµ÷ÓÃÏú»Ù·½·¨£»
+ * é”€æ¯ï¼š
+ * 		å•å®ä¾‹ï¼šå®¹å™¨å…³é—­çš„æ—¶å€™
+ * 		å¤šå®ä¾‹ï¼šå®¹å™¨ä¸ä¼šç®¡ç†è¿™ä¸ªbeanï¼›å®¹å™¨ä¸ä¼šè°ƒç”¨é”€æ¯æ–¹æ³•ï¼›
  * 
  * 
- * ±éÀúµÃµ½ÈİÆ÷ÖĞËùÓĞµÄBeanPostProcessor£»°¤¸öÖ´ĞĞbeforeInitialization£¬
- * Ò»µ«·µ»Ønull£¬Ìø³öforÑ­»·£¬²»»áÖ´ĞĞºóÃæµÄBeanPostProcessor.postProcessorsBeforeInitialization
+ * éå†å¾—åˆ°å®¹å™¨ä¸­æ‰€æœ‰çš„BeanPostProcessorï¼›æŒ¨ä¸ªæ‰§è¡ŒbeforeInitializationï¼Œ
+ * ä¸€ä½†è¿”å›nullï¼Œè·³å‡ºforå¾ªç¯ï¼Œä¸ä¼šæ‰§è¡Œåé¢çš„BeanPostProcessor.postProcessorsBeforeInitialization
  * 
- * BeanPostProcessorÔ­Àí
- * populateBean(beanName, mbd, instanceWrapper);¸øbean½øĞĞÊôĞÔ¸³Öµ
+ * BeanPostProcessoråŸç†
+ * populateBean(beanName, mbd, instanceWrapper);ç»™beanè¿›è¡Œå±æ€§èµ‹å€¼
  * initializeBean
  * {
  * applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
- * invokeInitMethods(beanName, wrappedBean, mbd);Ö´ĞĞ×Ô¶¨Òå³õÊ¼»¯
+ * invokeInitMethods(beanName, wrappedBean, mbd);æ‰§è¡Œè‡ªå®šä¹‰åˆå§‹åŒ–
  * applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
  *}
  * 
  * 
  * 
- * 1£©¡¢Ö¸¶¨³õÊ¼»¯ºÍÏú»Ù·½·¨£»
- * 		Í¨¹ı@BeanÖ¸¶¨init-methodºÍdestroy-method£»
- * 2£©¡¢Í¨¹ıÈÃBeanÊµÏÖInitializingBean£¨¶¨Òå³õÊ¼»¯Âß¼­£©£¬
- * 				DisposableBean£¨¶¨ÒåÏú»ÙÂß¼­£©;
- * 3£©¡¢¿ÉÒÔÊ¹ÓÃJSR250£»
- * 		@PostConstruct£ºÔÚbean´´½¨Íê³É²¢ÇÒÊôĞÔ¸³ÖµÍê³É£»À´Ö´ĞĞ³õÊ¼»¯·½·¨
- * 		@PreDestroy£ºÔÚÈİÆ÷Ïú»ÙbeanÖ®Ç°Í¨ÖªÎÒÃÇ½øĞĞÇåÀí¹¤×÷
- * 4£©¡¢BeanPostProcessor¡¾interface¡¿£ºbeanµÄºóÖÃ´¦ÀíÆ÷£»
- * 		ÔÚbean³õÊ¼»¯Ç°ºó½øĞĞÒ»Ğ©´¦Àí¹¤×÷£»
- * 		postProcessBeforeInitialization:ÔÚ³õÊ¼»¯Ö®Ç°¹¤×÷
- * 		postProcessAfterInitialization:ÔÚ³õÊ¼»¯Ö®ºó¹¤×÷
+ * 1ï¼‰ã€æŒ‡å®šåˆå§‹åŒ–å’Œé”€æ¯æ–¹æ³•ï¼›
+ * 		é€šè¿‡@BeanæŒ‡å®šinit-methodå’Œdestroy-methodï¼›
+ * 2ï¼‰ã€é€šè¿‡è®©Beanå®ç°InitializingBeanï¼ˆå®šä¹‰åˆå§‹åŒ–é€»è¾‘ï¼‰ï¼Œ
+ * 				DisposableBeanï¼ˆå®šä¹‰é”€æ¯é€»è¾‘ï¼‰;
+ * 3ï¼‰ã€å¯ä»¥ä½¿ç”¨JSR250ï¼›
+ * 		@PostConstructï¼šåœ¨beanåˆ›å»ºå®Œæˆå¹¶ä¸”å±æ€§èµ‹å€¼å®Œæˆï¼›æ¥æ‰§è¡Œåˆå§‹åŒ–æ–¹æ³•
+ * 		@PreDestroyï¼šåœ¨å®¹å™¨é”€æ¯beanä¹‹å‰é€šçŸ¥æˆ‘ä»¬è¿›è¡Œæ¸…ç†å·¥ä½œ
+ * 4ï¼‰ã€BeanPostProcessorã€interfaceã€‘ï¼šbeançš„åç½®å¤„ç†å™¨ï¼›
+ * 		åœ¨beanåˆå§‹åŒ–å‰åè¿›è¡Œä¸€äº›å¤„ç†å·¥ä½œï¼›
+ * 		postProcessBeforeInitialization:åœ¨åˆå§‹åŒ–ä¹‹å‰å·¥ä½œ
+ * 		postProcessAfterInitialization:åœ¨åˆå§‹åŒ–ä¹‹åå·¥ä½œ
  * 
- * Springµ×²ã¶Ô BeanPostProcessor µÄÊ¹ÓÃ£»
- * 		bean¸³Öµ£¬×¢ÈëÆäËû×é¼ş£¬@Autowired£¬ÉúÃüÖÜÆÚ×¢½â¹¦ÄÜ£¬@Async,xxx BeanPostProcessor;
+ * Springåº•å±‚å¯¹ BeanPostProcessor çš„ä½¿ç”¨ï¼›
+ * 		beanèµ‹å€¼ï¼Œæ³¨å…¥å…¶ä»–ç»„ä»¶ï¼Œ@Autowiredï¼Œç”Ÿå‘½å‘¨æœŸæ³¨è§£åŠŸèƒ½ï¼Œ@Async,xxx BeanPostProcessor;
  * 
  * @author lfy
  *

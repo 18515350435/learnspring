@@ -19,13 +19,13 @@ public class Dog implements ApplicationContextAware {
 		System.out.println("dog constructor...");
 	}
 	
-	//¶ÔÏó´´½¨²¢¸³ÖµÖ®ºóµ÷ÓÃ
+	//å¯¹è±¡åˆ›å»ºå¹¶èµ‹å€¼ä¹‹åè°ƒç”¨
 	@PostConstruct
 	public void init(){
 		System.out.println("Dog....@PostConstruct...");
 	}
 	
-	//ÈİÆ÷ÒÆ³ı¶ÔÏóÖ®Ç°
+	//å®¹å™¨ç§»é™¤å¯¹è±¡ä¹‹å‰
 	@PreDestroy
 	public void detory(){
 		System.out.println("Dog....@PreDestroy...");

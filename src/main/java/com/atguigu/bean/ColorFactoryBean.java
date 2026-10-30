@@ -3,10 +3,10 @@ package com.atguigu.bean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//´´½¨Ò»¸öSpring¶¨ÒåµÄFactoryBean
+//åˆ›å»ºä¸€ä¸ªSpringå®šä¹‰çš„FactoryBean
 public class ColorFactoryBean implements FactoryBean<Color> {
 
-	//·µ»ØÒ»¸öColor¶ÔÏó£¬Õâ¸ö¶ÔÏó»áÌí¼Óµ½ÈİÆ÷ÖĞ
+	//è¿”å›ä¸€ä¸ªColorå¯¹è±¡ï¼Œè¿™ä¸ªå¯¹è±¡ä¼šæ·»åŠ åˆ°å®¹å™¨ä¸­
 	@Override
 	public Color getObject() throws Exception {
 		// TODO Auto-generated method stub
@@ -19,9 +19,9 @@ public class ColorFactoryBean implements FactoryBean<Color> {
 		return Color.class;
 	}
 
-	//ÊÇµ¥Àı£¿
-	//true£ºÕâ¸öbeanÊÇµ¥ÊµÀı£¬ÔÚÈİÆ÷ÖĞ±£´æÒ»·İ
-	//false£º¶àÊµÀı£¬Ã¿´Î»ñÈ¡¶¼»á´´½¨Ò»¸öĞÂµÄbean£»
+	//æ˜¯å•ä¾‹ï¼Ÿ
+	//trueï¼šè¿™ä¸ªbeanæ˜¯å•å®ä¾‹ï¼Œåœ¨å®¹å™¨ä¸­ä¿å­˜ä¸€ä»½
+	//falseï¼šå¤šå®ä¾‹ï¼Œæ¯æ¬¡è·å–éƒ½ä¼šåˆ›å»ºä¸€ä¸ªæ–°çš„beanï¼›
 	@Override
 	public boolean isSingleton() {
 		// TODO Auto-generated method stub

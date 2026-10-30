@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class Person {
 	
-	//Ê¹ÓÃ@Value¸³Öµ£»
-	//1¡¢»ù±¾ÊıÖµ
-	//2¡¢¿ÉÒÔĞ´SpEL£» #{}
-	//3¡¢¿ÉÒÔĞ´${}£»È¡³öÅäÖÃÎÄ¼ş¡¾properties¡¿ÖĞµÄÖµ£¨ÔÚÔËĞĞ»·¾³±äÁ¿ÀïÃæµÄÖµ£©
+	//ä½¿ç”¨@Valueèµ‹å€¼ï¼›
+	//1ã€åŸºæœ¬æ•°å€¼
+	//2ã€å¯ä»¥å†™SpELï¼› #{}
+	//3ã€å¯ä»¥å†™${}ï¼›å–å‡ºé…ç½®æ–‡ä»¶ã€propertiesã€‘ä¸­çš„å€¼ï¼ˆåœ¨è¿è¡Œç¯å¢ƒå˜é‡é‡Œé¢çš„å€¼ï¼‰
 	
-	@Value("ÕÅÈı")
+	@Value("å¼ ä¸‰")
 	private String name;
 	@Value("#{20-2}")
 	private Integer age;

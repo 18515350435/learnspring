@@ -22,8 +22,8 @@ public class IOCTest_Ext {
 		AnnotationConfigApplicationContext applicationContext  = new AnnotationConfigApplicationContext(ExtConfig.class);
 		
 		
-		//·¢²¼ÊÂ¼ş£»
-		applicationContext.publishEvent(new ApplicationEvent(new String("ÎÒ·¢²¼µÄÊ±¼ä")) {
+		//å‘å¸ƒäº‹ä»¶ï¼›
+		applicationContext.publishEvent(new ApplicationEvent(new String("æˆ‘å‘å¸ƒçš„æ—¶é—´")) {
 		});
 		
 		applicationContext.close();

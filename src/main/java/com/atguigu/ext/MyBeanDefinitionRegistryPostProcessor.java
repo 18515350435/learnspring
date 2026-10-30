@@ -17,14 +17,14 @@ public class MyBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegi
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// TODO Auto-generated method stub
-		System.out.println("MyBeanDefinitionRegistryPostProcessor...beanµÄÊıÁ¿£º"+beanFactory.getBeanDefinitionCount());
+		System.out.println("MyBeanDefinitionRegistryPostProcessor...beançš„æ•°é‡ï¼š"+beanFactory.getBeanDefinitionCount());
 	}
 
-	//BeanDefinitionRegistry Bean¶¨ÒåĞÅÏ¢µÄ±£´æÖĞĞÄ£¬ÒÔºóBeanFactory¾ÍÊÇ°´ÕÕBeanDefinitionRegistryÀïÃæ±£´æµÄÃ¿Ò»¸öbean¶¨ÒåĞÅÏ¢´´½¨beanÊµÀı£»
+	//BeanDefinitionRegistry Beanå®šä¹‰ä¿¡æ¯çš„ä¿å­˜ä¸­å¿ƒï¼Œä»¥åBeanFactoryå°±æ˜¯æŒ‰ç…§BeanDefinitionRegistryé‡Œé¢ä¿å­˜çš„æ¯ä¸€ä¸ªbeanå®šä¹‰ä¿¡æ¯åˆ›å»ºbeanå®ä¾‹ï¼›
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		// TODO Auto-generated method stub
-		System.out.println("postProcessBeanDefinitionRegistry...beanµÄÊıÁ¿£º"+registry.getBeanDefinitionCount());
+		System.out.println("postProcessBeanDefinitionRegistry...beançš„æ•°é‡ï¼š"+registry.getBeanDefinitionCount());
 		//RootBeanDefinition beanDefinition = new RootBeanDefinition(Blue.class);
 		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(Blue.class).getBeanDefinition();
 		registry.registerBeanDefinition("hello", beanDefinition);
