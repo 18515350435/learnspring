@@ -12,3 +12,7 @@ Thumbs.db
 
 # 日志
 *.log
+
+# 构建产物：由 node build-single.js 生成，手机版内容已在 gh-pages 分支上
+星光小马-手机版.html
+dist-mobile/

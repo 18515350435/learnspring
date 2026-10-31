@@ -189,6 +189,26 @@
       }).join('') : '<p class="muted">暂无记录</p>') + '</div>';
   }
 
+  /* ---------- 破解开关 ---------- */
+
+  function renderCheatBtn() {
+    var b = el('#cheatBtn');
+    if (!b) return;
+    var on = S.cheatOn();
+    b.classList.toggle('on', on);
+    b.textContent = on ? '🔓 破解中' : '🔒 破解开关';
+    b.title = on ? '点击关闭破解，恢复到开启前的解锁状态' : '点击解锁全部小马和饰品';
+  }
+
+  function toggleCheat() {
+    var on = !S.cheatOn();
+    if (!on && !confirm('关闭破解后，会收回靠破解解锁的内容，恢复到开启破解前的状态。确定吗？')) return;
+    S.setCheat(on);
+    renderCheatBtn();
+    toast(on ? '破解已开启：全部小马和饰品已解锁' : '破解已关闭，已恢复原状');
+    if (unlockedUI) render();
+  }
+
   /* ---------- 自定义任务弹层 ---------- */
 
   function openNewTask() {
@@ -221,6 +241,7 @@
       var n, t = e.target;
       function hit(sel) { return t.closest ? t.closest(sel) : null; }
 
+      if ((n = hit('[data-cheat]'))) { toggleCheat(); return; }
       if ((n = hit('[data-atab]'))) { tab = n.getAttribute('data-atab'); render(); return; }
       if ((n = hit('[data-close]'))) { closeModal(); return; }
 
@@ -333,6 +354,7 @@
   }
 
   function render() {
+    renderCheatBtn();
     if (!unlockedUI) return;
     document.querySelectorAll('[data-atab]').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-atab') === tab);
@@ -351,6 +373,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     bind();
+    renderCheatBtn();
     var btn = el('#pinBtn');
     if (btn) btn.addEventListener('click', checkPin);
     var f = el('#pinField');

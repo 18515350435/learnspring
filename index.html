@@ -21,9 +21,19 @@
       <button class="nav-btn" data-tab="studio" type="button">妆造台</button>
       <button class="nav-btn" data-tab="tasks" type="button">任务<em id="pendingBadge" class="dot">0</em></button>
       <button class="nav-btn" data-tab="gallery" type="button">图鉴</button>
+      <button class="nav-btn" data-tab="home" type="button">🏠 家园</button>
+      <button class="nav-btn" data-tab="shop" type="button">⭐ 商店</button>
+      <button class="nav-btn" data-tab="games" type="button">🎮 游戏</button>
+      <button class="nav-btn" data-tab="ach" type="button">🏅 成就</button>
+      <button class="nav-btn" data-tab="album" type="button">📷 相册</button>
+      <button class="nav-btn cheat-btn" id="cheatBtn" data-cheat type="button">🔒 破解开关</button>
       <a class="nav-btn alt" href="admin.html">家长端</a>
     </nav>
-    <div class="who"><i>你好，</i><b id="playerName">小朋友</b></div>
+    <div class="who">
+      <span class="wallet-chip">⭐ <b id="topStar">0</b></span>
+      <span class="wallet-chip lv" id="topLevel">Lv.1</span>
+      <span class="who-name"><i>你好，</i><b id="playerName">小朋友</b></span>
+    </div>
   </div>
 </header>
 
@@ -38,6 +48,9 @@
 <script src="js/data.js"></script>
 <script src="js/pony.js"></script>
 <script src="js/store.js"></script>
+<script src="js/home.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/games.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

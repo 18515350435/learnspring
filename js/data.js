@@ -121,8 +121,106 @@
     { id: 't24', title: '学会做一道菜', desc: '从洗菜到装盘，亲手完成。', tag: '劳动', rewards: ['pony:applejack'] }
   ];
 
+  /* 任务星级：决定通过后发放多少星星币（star × 10） */
+  var STAR_MAP = {
+    t01: 1, t02: 2, t03: 1, t04: 1, t05: 1, t06: 2, t07: 2, t08: 2, t09: 1, t10: 2,
+    t11: 2, t12: 2, t13: 2, t14: 3, t15: 3, t16: 3, t17: 2, t18: 3, t19: 3, t20: 3,
+    t21: 3, t22: 2, t23: 2, t24: 3
+  };
+  TASKS.forEach(function (t) { t.star = STAR_MAP[t.id] || 1; });
+
+  /* ---------- 家园养成：需求 / 商店 / 成就 ---------- */
+
+  /* 小马的四项需求 */
+  var NEEDS = [
+    { id: 'food', name: '吃饱', icon: '🍎', color: '#ff8fa3' },
+    { id: 'clean', name: '干净', icon: '🛁', color: '#6fb7e8' },
+    { id: 'mood', name: '开心', icon: '💖', color: '#ff7fb0' },
+    { id: 'energy', name: '精神', icon: '⚡', color: '#f5b731' }
+  ];
+
+  /* 商店商品：cat = food 食物 / toy 玩具 / furni 家具 / wall 墙纸 / floor 地板
+     食物与玩具带 need（对四项需求的增减），lv 是购买所需等级 */
+  var GOODS = [
+    { id: 'f-apple', cat: 'food', name: '脆苹果', price: 5, lv: 1, icon: '🍎', need: { food: 25, mood: 3 } },
+    { id: 'f-carrot', cat: 'food', name: '甜胡萝卜', price: 8, lv: 1, icon: '🥕', need: { food: 32, mood: 4 } },
+    { id: 'f-cake', cat: 'food', name: '星星蛋糕', price: 16, lv: 2, icon: '🍰', need: { food: 55, mood: 10 } },
+    { id: 'f-candy', cat: 'food', name: '彩虹糖', price: 24, lv: 3, icon: '🍬', need: { food: 40, mood: 18 } },
+    { id: 'f-ice', cat: 'food', name: '云朵冰淇淋', price: 38, lv: 4, icon: '🍦', need: { food: 70, mood: 22 } },
+    { id: 'f-feast', cat: 'food', name: '派对套餐', price: 60, lv: 5, icon: '🎂', need: { food: 100, mood: 35 } },
+
+    { id: 't-ball', cat: 'toy', name: '彩虹皮球', price: 30, lv: 1, icon: '⚽', need: { mood: 25, energy: -8 } },
+    { id: 't-bubble', cat: 'toy', name: '泡泡机', price: 45, lv: 2, icon: '🫧', need: { mood: 32, clean: 10, energy: -6 } },
+    { id: 't-music', cat: 'toy', name: '星星音乐盒', price: 65, lv: 3, icon: '🎵', need: { mood: 45, energy: 10 } },
+    { id: 't-swing', cat: 'toy', name: '云朵秋千', price: 95, lv: 5, icon: '🎠', need: { mood: 60, energy: -12 } },
+
+    { id: 'u-sofa', cat: 'furni', name: '云朵沙发', price: 50, lv: 1, w: 130, h: 76, icon: '🛋️' },
+    { id: 'u-shelf', cat: 'furni', name: '星星书架', price: 70, lv: 2, w: 92, h: 116, icon: '📚' },
+    { id: 'u-lamp', cat: 'furni', name: '蘑菇小灯', price: 40, lv: 1, w: 48, h: 84, icon: '🍄' },
+    { id: 'u-tent', cat: 'furni', name: '秘密帐篷', price: 85, lv: 3, w: 136, h: 104, icon: '⛺' },
+    { id: 'u-bed', cat: 'furni', name: '公主床', price: 110, lv: 4, w: 144, h: 82, icon: '🛏️' },
+    { id: 'u-rug', cat: 'furni', name: '彩虹地毯', price: 60, lv: 2, w: 190, h: 44, icon: '🟣', flat: true },
+    { id: 'u-horse', cat: 'furni', name: '摇摆木马', price: 90, lv: 3, w: 84, h: 84, icon: '🎠' },
+    { id: 'u-tub', cat: 'furni', name: '泡泡浴缸', price: 75, lv: 2, w: 112, h: 72, icon: '🛁', desc: '小马脏了可以来泡个泡泡澡' },
+    { id: 'u-toilet', cat: 'furni', name: '云朵马桶', price: 40, lv: 1, w: 84, h: 88, icon: '🚽', desc: '小马想上厕所时会自己跑过来（初始星星币 + 首次打卡正好买得起）' },
+    { id: 'u-sink', cat: 'furni', name: '星星洗手台', price: 55, lv: 2, w: 76, h: 86, icon: '🚰', desc: '上完厕所会自己过来洗手，讲卫生' },
+    { id: 'u-piano', cat: 'furni', name: '糖果钢琴', price: 130, lv: 5, w: 124, h: 94, icon: '🎹' },
+    { id: 'u-plant', cat: 'furni', name: '星星盆栽', price: 35, lv: 1, w: 52, h: 74, icon: '🪴' },
+
+    { id: 'w-cloud', cat: 'wall', name: '粉云墙纸', price: 40, lv: 1, swatch: '#ffd9ec' },
+    { id: 'w-star', cat: 'wall', name: '星夜墙纸', price: 55, lv: 2, swatch: '#cdb9f2' },
+    { id: 'w-candy', cat: 'wall', name: '糖果墙纸', price: 65, lv: 3, swatch: '#ffe1ea' },
+    { id: 'w-mint', cat: 'wall', name: '薄荷墙纸', price: 65, lv: 3, swatch: '#d6f2e9' },
+
+    { id: 'g-marble', cat: 'floor', name: '云石地板', price: 35, lv: 1, swatch: '#f3e6f7' },
+    { id: 'g-wood', cat: 'floor', name: '蜜色木地板', price: 45, lv: 2, swatch: '#f7dcb4' },
+    { id: 'g-grass', cat: 'floor', name: '青草地板', price: 60, lv: 3, swatch: '#c9e9b0' }
+  ];
+
+  var CAT_NAMES = { food: '美食', toy: '玩具', furni: '家具', wall: '墙纸', floor: '地板' };
+
+  /* 成就：达成时一次性发放星星币 */
+  var ACHIEVEMENTS = [
+    { id: 'a-pet', name: '初次见面', desc: '第一次摸摸小马', stars: 20 },
+    { id: 'a-friend', name: '好朋友', desc: '任意小马爱心达到 50', stars: 30 },
+    { id: 'a-best', name: '最佳伙伴', desc: '任意小马爱心达到 200', stars: 80 },
+    { id: 'a-allpony', name: '小马谷居民', desc: '解锁全部 6 匹小马', stars: 100 },
+    { id: 'a-wardrobe', name: '衣柜大师', desc: '解锁 20 件饰品', stars: 60 },
+    { id: 'a-task5', name: '任务新星', desc: '完成 5 个任务', stars: 30 },
+    { id: 'a-task15', name: '任务达人', desc: '完成 15 个任务', stars: 70 },
+    { id: 'a-rich', name: '小小富翁', desc: '累计获得 500 星星币', stars: 50 },
+    { id: 'a-designer', name: '室内设计师', desc: '拥有 5 件家具', stars: 50 },
+    { id: 'a-star30', name: '抓星高手', desc: '抓星星单局拿到 30 分', stars: 40 },
+    { id: 'a-memory', name: '记忆大师', desc: '12 步内完成记忆翻牌', stars: 40 },
+    { id: 'a-streak7', name: '坚持不懈', desc: '连续打卡 7 天', stars: 60 },
+    { id: 'a-photo', name: '小小摄影师', desc: '拍下 3 张家园照片', stars: 30 },
+    { id: 'a-full', name: '满分照料', desc: '所有小马四项需求都超过 80', stars: 60 },
+    { id: 'a-level5', name: '成长之路', desc: '等级达到 5 级', stars: 60 },
+    { id: 'a-potty', name: '自己会上厕所', desc: '第一次带小马用马桶', stars: 30 },
+    { id: 'a-wash', name: '讲卫生的好孩子', desc: '上完厕所洗手 10 次', stars: 50 }
+  ];
+
+  var WEATHERS = [
+    { id: 'sunny', name: '晴天', icon: '☀️' },
+    { id: 'cloudy', name: '多云', icon: '☁️' },
+    { id: 'rain', name: '下雨', icon: '🌧️' },
+    { id: 'snow', name: '下雪', icon: '❄️' }
+  ];
+
+  /* 照料倾向累积到最多的一项，会成为小马的性格 */
+  var TRAITS = {
+    food: { name: '小吃货', desc: '最爱吃东西，闻到香味第一个跑过来' },
+    mood: { name: '开心果', desc: '天天乐呵呵，最喜欢和你一起玩' },
+    clean: { name: '爱干净', desc: '最喜欢洗香香、梳得漂漂亮亮' },
+    energy: { name: '瞌睡虫', desc: '晒着太阳就能睡着，梦里还在吃苹果' },
+    pet: { name: '黏人精', desc: '最喜欢被摸摸，你走哪它跟哪' }
+  };
+
   /* 反查表 */
   var itemMap = {}, ponyMap = {}, taskMap = {}, unlockSource = {};
+  var goodsMap = {}, achMap = {};
+  GOODS.forEach(function (g) { goodsMap[g.id] = g; });
+  ACHIEVEMENTS.forEach(function (a) { achMap[a.id] = a; });
   ITEMS.forEach(function (it) {
     itemMap[it.id] = it;
     it.taskId = null;
@@ -151,6 +249,21 @@
     task: function (id) { return taskMap[id]; },
     bySlot: function (slot) { return ITEMS.filter(function (i) { return i.slot === slot; }); },
     taskOf: function (rewardKey) { return taskMap[unlockSource[rewardKey]]; },
+    NEEDS: NEEDS,
+    GOODS: GOODS,
+    CAT_NAMES: CAT_NAMES,
+    ACHIEVEMENTS: ACHIEVEMENTS,
+    WEATHERS: WEATHERS,
+    TRAITS: TRAITS,
+    goods: function (id) { return goodsMap[id] || null; },
+    goodsBy: function (cat) { return GOODS.filter(function (g) { return g.cat === cat; }); },
+    achievement: function (id) { return achMap[id] || null; },
+    weather: function (id) {
+      for (var i = 0; i < WEATHERS.length; i++) if (WEATHERS[i].id === id) return WEATHERS[i];
+      return WEATHERS[0];
+    },
+    checkinReward: function (day) { return 10 + Math.min(Math.max(day - 1, 0), 10) * 5; },
+    xpForLevel: function (lv) { return 100 + (lv - 1) * 80; },
     allTasks: function () {
       var extra = (window.Store && window.Store.customTasks) ? window.Store.customTasks() : [];
       return extra.concat(TASKS);

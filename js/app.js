@@ -236,6 +236,61 @@
       '</div>';
   }
 
+  /* ---------- 成就 ---------- */
+
+  function timeText(ts) {
+    var d = new Date(ts);
+    function p(n) { return n < 10 ? '0' + n : '' + n; }
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function renderAch() {
+    var st = S.state();
+    var got = D.ACHIEVEMENTS.filter(function (a) { return S.hasAch(a.id); }).length;
+    el('#panel').innerHTML = '' +
+      '<div class="ach">' +
+      '  <div class="adm-head"><h2 class="sec-title">我的成就 <em>' + got + ' / ' + D.ACHIEVEMENTS.length + '</em></h2>' +
+      '    <p class="muted">达成成就就能领一大笔星星币，看看还差哪些～</p></div>' +
+      '  <div class="ach-grid">' + D.ACHIEVEMENTS.map(function (a) {
+        var has = S.hasAch(a.id);
+        return '<div class="ach-card' + (has ? ' got' : '') + '">' +
+          '<span class="ach-medal">' + (has ? '🏅' : '🔒') + '</span>' +
+          '<b>' + esc(a.name) + '</b>' +
+          '<i>' + esc(a.desc) + '</i>' +
+          '<span class="ach-star">⭐ ' + a.stars + '</span>' +
+          (has ? '<span class="ach-time">' + timeText(st.achievements[a.id]) + '</span>' : '') +
+          '</div>';
+      }).join('') + '</div>' +
+      '</div>';
+  }
+
+  /* ---------- 相册 ---------- */
+
+  function renderAlbum() {
+    var st = S.state();
+    el('#panel').innerHTML = '' +
+      '<div class="album">' +
+      '  <div class="adm-head"><h2 class="sec-title">家园相册 <em>' + st.album.length + ' / 12</em></h2>' +
+      '    <p class="muted">在家园里点「📷 拍张照」就能把当时的样子存下来。</p></div>' +
+      (st.album.length ? '<div class="album-grid">' + st.album.map(function (p, i) {
+        var wall = D.goods(p.wall), floor = D.goods(p.floor);
+        var w = D.weather(p.weather);
+        return '<div class="photo">' +
+          '<div class="ph-view" style="background:' + ((wall && wall.swatch) || '#ffd9ec') + '">' +
+          '  <span class="ph-floor" style="background:' + ((floor && floor.swatch) || '#f3e6f7') + '"></span>' +
+          '  <span class="ph-sky">' + (p.day ? '☀️' : '🌙') + ' ' + w.icon + '</span>' +
+          '  <span class="ph-ponies">' + p.ponies.slice(0, 4).map(function (x) {
+            var pp = D.pony(x.id);
+            return pp ? A.render({ ponyId: x.id, outfit: {}, width: 46 }) : '';
+          }).join('') + '</span>' +
+          '</div>' +
+          '<div class="ph-info"><b>' + esc(p.name) + '</b><i>' + timeText(p.at) + '</i>' +
+          '<button class="btn danger xs" data-phdel="' + i + '" type="button">删除</button></div>' +
+          '</div>';
+      }).join('') + '</div>' : '<div class="empty">还没有照片，去家园拍一张吧～</div>') +
+      '</div>';
+  }
+
   /* ---------- 图鉴 ---------- */
 
   function renderGallery() {
@@ -311,6 +366,23 @@
     openModal(body);
   }
 
+  function renderCheatBtn() {
+    var b = el('#cheatBtn');
+    if (!b) return;
+    var on = S.cheatOn();
+    b.classList.toggle('on', on);
+    b.textContent = on ? '🔓 破解中' : '🔒 破解开关';
+    b.title = on ? '点击关闭破解，恢复到开启前的解锁状态' : '点击解锁全部小马和饰品';
+  }
+
+  function toggleCheat() {
+    var on = !S.cheatOn();
+    if (!on && !confirm('关闭破解后，会收回靠破解解锁的内容，恢复到开启破解前的状态。确定吗？')) return;
+    S.setCheat(on);
+    toast(on ? '破解已开启：全部小马和饰品已解锁' : '破解已关闭，已恢复原状');
+    render();
+  }
+
   function askSubmit(t) {
     openModal('<h3>' + esc(t.title) + '</h3>' +
       '<p class="muted">完成了就和爸爸妈妈说一声，写点什么让他们放心吧。</p>' +
@@ -362,6 +434,7 @@
       };
       var n;
 
+      if ((n = hit('[data-cheat]'))) { toggleCheat(); return; }
       if ((n = hit('[data-tab]'))) { tab = n.getAttribute('data-tab'); render(); return; }
       if ((n = hit('[data-cat]'))) { catFilter = n.getAttribute('data-cat'); render(); return; }
       if ((n = hit('[data-tfilter]'))) { taskFilter = n.getAttribute('data-tfilter'); render(); return; }
@@ -445,6 +518,18 @@
         render();
         return;
       }
+      if ((n = hit('[data-docheckin]'))) {
+        var r = S.doCheckin();
+        closeModal();
+        if (r) toast('打卡成功！连续 ' + r.streak + ' 天，⭐ +' + r.reward);
+        render();
+        return;
+      }
+      if ((n = hit('[data-phdel]'))) {
+        S.removePhoto(parseInt(n.getAttribute('data-phdel'), 10));
+        render();
+        return;
+      }
       if ((n = hit('[data-reload]'))) { render(); return; }
     });
   }
@@ -457,10 +542,25 @@
     });
   }
 
+  function checkPendingAch() {
+    var list = S.takePendingAch();
+    list.forEach(function (a, i) {
+      setTimeout(function () { toast('🏅 成就达成 · ' + a.name + '　+' + a.stars + '⭐'); }, i * 700);
+    });
+  }
+
   function render() {
     renderNav();
+    renderCheatBtn();
+    if (window.Home) window.Home.stop();
+    if (window.Games && tab !== 'games') window.Games.stop();
     if (tab === 'studio') renderStudio();
     else if (tab === 'tasks') renderTasks();
+    else if (tab === 'home') window.Home.mount(el('#panel'));
+    else if (tab === 'shop') window.Shop.mount(el('#panel'));
+    else if (tab === 'games') window.Games.mount(el('#panel'));
+    else if (tab === 'ach') renderAch();
+    else if (tab === 'album') renderAlbum();
     else renderGallery();
     var st = S.state();
     var badge = el('#pendingBadge');
@@ -471,6 +571,30 @@
     }
     var nameNode = el('#playerName');
     if (nameNode) nameNode.textContent = st.player;
+    var ts = el('#topStar');
+    if (ts) ts.textContent = st.stars;
+    var tl = el('#topLevel');
+    if (tl) tl.textContent = 'Lv.' + st.level;
+    checkPendingAch();
+  }
+
+  /* ---------- 每日打卡 ---------- */
+
+  function openCheckin() {
+    var c = S.checkinState();
+    var day = c.streak + 1;
+    var dots = '';
+    for (var i = 1; i <= 7; i++) {
+      dots += '<span class="sk-dot' + (i <= day ? ' on' : '') + '">' + (i <= day ? '✓' : i) + '</span>';
+    }
+    openModal('<h3>🎁 每日打卡</h3>' +
+      '<p class="muted">今天是连续第 <b>' + day + '</b> 天，可以领 <b>⭐ ' + c.next + '</b> 星星币。</p>' +
+      '<div class="streak-row">' + dots + '</div>' +
+      '<p class="muted sm">连续打卡越久，每天领得越多（最多 60 ⭐）。</p>' +
+      '<div class="modal-actions">' +
+      '  <button class="btn ghost" data-close type="button">等会儿再说</button>' +
+      '  <button class="btn primary" data-docheckin type="button">领星星</button>' +
+      '</div>');
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -483,6 +607,19 @@
     }
     bind();
     render();
+    if (!S.checkinState().done) openCheckin();
     S.onChange(function (_, external) { if (external) render(); });
+    window.addEventListener('home:decor', function () {
+      if (window.Shop) window.Shop.focus('wall');
+      tab = 'shop';
+      render();
+    });
   });
+
+  window.App = {
+    toast: toast,
+    render: function () { render(); },
+    go: function (t) { tab = t; render(); },
+    popAch: checkPendingAch      /* 家园里达成成就时立刻弹提示，不用等切页签 */
+  };
 })();
