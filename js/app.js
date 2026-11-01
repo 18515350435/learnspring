@@ -231,7 +231,7 @@
       '<p class="task-desc">' + esc(t.desc) + '</p>' +
       (rec.note ? '<p class="task-note">我的留言：' + esc(rec.note) + '</p>' : '') +
       (rec.reason ? '<p class="task-reason">家长说：' + esc(rec.reason) + '</p>' : '') +
-      '<div class="task-rewards">' + rw + '</div>' +
+      '<div class="task-rewards">' + rw + '<span class="rw rw-star">+' + ((t.star || 1) * 10) + ' ⭐</span></div>' +
       '<div class="task-foot">' + foot + '</div>' +
       '</div>';
   }

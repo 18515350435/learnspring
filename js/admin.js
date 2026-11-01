@@ -102,7 +102,10 @@
           '<span class="tops">' +
           (s !== 'approved' ? '<button class="btn primary xs" data-approve="' + t.id + '" type="button">通过</button>' : '') +
           (s !== 'todo' ? '<button class="btn ghost xs" data-reopen="' + t.id + '" type="button">重置</button>' : '') +
-          (t.custom ? '<button class="btn danger xs" data-delcustom="' + t.id + '" type="button">删除</button>' : '') +
+          (t.custom
+            ? '<button class="btn ghost xs" data-editcustom="' + t.id + '" type="button">编辑</button>' +
+              '<button class="btn danger xs" data-delcustom="' + t.id + '" type="button">删除</button>'
+            : '<button class="btn ghost xs" data-clonetask="' + t.id + '" type="button">改成我的</button>') +
           '</span>' +
           '</div>';
       }).join('') +
@@ -167,13 +170,19 @@
       '<h3 class="sec-title">自定义任务</h3>' +
       (st.customTasks.length ? '<div class="table">' + st.customTasks.map(function (t) {
         return '<div class="tr">' +
-          '<span class="tname">' + esc(t.title) + '<i>自定义</i></span>' +
-          '<span class="trw">' + rewardNames(t).map(function (n) { return esc(n); }).join('、') + '</span>' +
+          '<span class="tname">' + esc(t.title) + '<i>' + esc(t.tag || '自定义') + '</i>' +
+            (t.desc ? '<em class="tdesc">' + esc(t.desc) + '</em>' : '') + '</span>' +
+          '<span class="trw">' + rewardNames(t).map(function (n) { return esc(n); }).join('、') +
+            '<em class="tdesc">+' + ((t.star || 1) * 10) + '⭐</em></span>' +
           '<span><span class="badge ' + S.taskStatus(t.id) + '">' + STATUS_TEXT[S.taskStatus(t.id)] + '</span></span>' +
-          '<span class="tops"><button class="btn danger xs" data-delcustom="' + t.id + '" type="button">删除</button></span>' +
+          '<span class="tops">' +
+            '<button class="btn ghost xs" data-editcustom="' + t.id + '" type="button">编辑</button>' +
+            '<button class="btn danger xs" data-delcustom="' + t.id + '" type="button">删除</button>' +
+          '</span>' +
           '</div>';
-      }).join('') + '</div>' : '<p class="muted">还没有自定义任务。</p>') +
-      '<div class="form-row"><button class="btn primary sm" id="newTask" type="button">新增自定义任务</button></div>' +
+      }).join('') + '</div>' : '<p class="muted">还没有自定义任务。可以点下面新增，比如「自己叠被子」「练琴 20 分钟」。</p>') +
+      '<div class="form-row"><button class="btn primary sm" id="newTask" type="button">新增自定义任务</button>' +
+      '<span class="muted sm">自定义任务可以反复修改名称、说明、奖励和星星币数量</span></div>' +
       '<h3 class="sec-title">数据维护</h3>' +
       '<div class="form-row wrap">' +
       '  <button class="btn ghost sm" id="exportBtn" type="button">导出存档</button>' +
@@ -211,28 +220,54 @@
 
   /* ---------- 自定义任务弹层 ---------- */
 
-  function openNewTask() {
+  function rwPicked() {
+    return Array.prototype.slice.call(document.querySelectorAll('.rw-picker input:checked')).map(function (i) { return i.value; });
+  }
+
+  function rwCount() {
+    var b = el('#rwCount');
+    if (b) b.textContent = rwPicked().length;
+  }
+
+  /* t 为空 = 新增；传入任务对象 = 修改 */
+  function openTaskForm(t) {
+    var edit = !!t;
+    var picked = (t && t.rewards) ? t.rewards.slice() : [];
+    var star = (t && t.star) ? t.star : 1;
+
     var groups = D.CATS.map(function (c) {
-      return '<div class="rw-group"><h5>' + c.name + '</h5>' + D.bySlot(c.id).map(function (i) {
-        return '<label class="ck"><input type="checkbox" value="' + i.id + '"><span>' + i.name + '</span></label>';
+      return '<div class="rw-group"><h5>' + esc(c.name) + '</h5>' + D.bySlot(c.id).map(function (i) {
+        return '<label class="ck"><input type="checkbox" value="' + i.id + '"' + (picked.indexOf(i.id) >= 0 ? ' checked' : '') + '><span>' + esc(i.name) + '</span></label>';
       }).join('') + '</div>';
     }).join('');
     var ponies = '<div class="rw-group"><h5>小马伙伴</h5>' + D.PONIES.filter(function (p) { return !p.initial; }).map(function (p) {
-      return '<label class="ck"><input type="checkbox" value="pony:' + p.id + '"><span>' + p.name + '</span></label>';
+      var v = 'pony:' + p.id;
+      return '<label class="ck"><input type="checkbox" value="' + v + '"' + (picked.indexOf(v) >= 0 ? ' checked' : '') + '><span>' + esc(p.name) + '</span></label>';
     }).join('') + '</div>';
 
-    openModal('<h3>新增自定义任务</h3>' +
+    openModal('<h3>' + (edit ? '修改自定义任务' : '新增自定义任务') + '</h3>' +
       '<div class="form-col">' +
-      '  <input id="ntTitle" class="ipt" placeholder="任务名称，例如：整理自己的玩具柜">' +
-      '  <input id="ntDesc" class="ipt" placeholder="任务要求说明（可选）">' +
-      '  <p class="muted sm">勾选完成后要发放的奖励：</p>' +
+      '  <input type="hidden" id="ntId" value="' + (edit ? esc(t.id) : '') + '">' +
+      '  <input id="ntTitle" class="ipt" maxlength="30" placeholder="任务名称，例如：整理自己的玩具柜" value="' + (edit ? esc(t.title) : '') + '">' +
+      '  <input id="ntDesc" class="ipt" maxlength="60" placeholder="任务要求说明（可选）" value="' + (edit ? esc(t.desc || '') : '') + '">' +
+      '  <label class="form-row"><span class="fr-label">完成后奖励星星币</span>' +
+      '    <input id="ntStar" class="ipt sm-ipt" type="number" min="1" max="10" step="1" value="' + star + '">' +
+      '    <span class="muted sm">× 10 = ' + '<b id="ntStarNum">' + (star * 10) + '</b>' + ' ⭐</span>' +
+      '  </label>' +
+      '  <div class="rw-bar">' +
+      '    <p class="muted sm">勾选完成后要发放的奖励：</p>' +
+      '    <span class="rw-tools"><span class="muted sm">已选 <b id="rwCount">' + picked.length + '</b> 项</span>' +
+      '      <button class="btn ghost xs" id="rwClear" type="button">清空</button></span>' +
+      '  </div>' +
       '  <div class="rw-picker">' + groups + ponies + '</div>' +
       '</div>' +
       '<div class="modal-actions">' +
       '  <button class="btn ghost" data-close type="button">取消</button>' +
-      '  <button class="btn primary" id="doNewTask" type="button">创建</button>' +
+      '  <button class="btn primary" id="doNewTask" type="button">' + (edit ? '保存修改' : '创建任务') + '</button>' +
       '</div>');
   }
+
+  function openNewTask() { openTaskForm(null); }
 
   /* ---------- 事件 ---------- */
 
@@ -276,6 +311,21 @@
         render();
         return;
       }
+      if ((n = hit('[data-editcustom]'))) {
+        var et = S.findTask(n.getAttribute('data-editcustom'));
+        if (et) openTaskForm(et); else toast('这个任务已经不存在了');
+        return;
+      }
+      if ((n = hit('[data-clonetask]'))) {
+        var src = S.findTask(n.getAttribute('data-clonetask'));
+        if (!src) { toast('任务不存在'); return; }
+        var nid = S.addCustomTask(src.title, src.desc || '', (src.rewards || []).slice(), src.star || 1);
+        var nt = S.findTask(nid);
+        render();
+        toast('已复制成你的自定义任务，接着改吧');
+        if (nt) openTaskForm(nt);
+        return;
+      }
       if ((n = hit('[data-delcustom]'))) {
         if (confirm('确定删除这个自定义任务吗？')) {
           S.removeCustomTask(n.getAttribute('data-delcustom'));
@@ -294,33 +344,53 @@
         return;
       }
 
-      if (n && n.id === 'newTask') { openNewTask(); return; }
-      if (n && n.id === 'doNewTask') {
-        var ttl = el('#ntTitle'), dsc = el('#ntDesc');
-        var rw = Array.prototype.slice.call(document.querySelectorAll('.rw-picker input:checked')).map(function (i) { return i.value; });
+      /* 下面这些按 id 命中，必须重新取一次：上面的 hit() 已经把 n 置空了 */
+      if ((n = hit('#rwClear'))) {
+        Array.prototype.slice.call(document.querySelectorAll('.rw-picker input')).forEach(function (i) { i.checked = false; });
+        rwCount();
+        return;
+      }
+      if ((n = hit('#newTask'))) { openNewTask(); return; }
+      if ((n = hit('#doNewTask'))) {
+        var ttl = el('#ntTitle'), dsc = el('#ntDesc'), tid = el('#ntId'), str = el('#ntStar');
+        var rw = rwPicked();
         if (!ttl || !ttl.value.trim()) { toast('请先填写任务名称'); return; }
-        S.addCustomTask(ttl.value.trim(), dsc ? dsc.value.trim() : '', rw);
+        var sstar = str ? parseInt(str.value, 10) : 1;
+        if (isNaN(sstar) || sstar < 1) sstar = 1;
+        if (sstar > 10) sstar = 10;
+        var eid = tid && tid.value ? tid.value : '';
+        if (eid) {
+          if (!S.updateCustomTask(eid, ttl.value.trim(), dsc ? dsc.value.trim() : '', rw, sstar)) {
+            toast('这个任务已经不存在了');
+            return;
+          }
+          closeModal();
+          toast('任务已更新');
+          render();
+          return;
+        }
+        S.addCustomTask(ttl.value.trim(), dsc ? dsc.value.trim() : '', rw, sstar);
         closeModal();
         toast('自定义任务已创建');
         render();
         return;
       }
-      if (n && n.id === 'saveName') {
+      if ((n = hit('#saveName'))) {
         var ni = el('#nameInput');
         if (ni) { S.state().player = ni.value.trim() || '小朋友'; S.save(); toast('已保存'); }
         return;
       }
-      if (n && n.id === 'savePin') {
+      if ((n = hit('#savePin'))) {
         var pi = el('#pinInput');
         if (pi) { S.state().pin = pi.value.trim() || '1234'; S.save(); toast('密码已更新'); }
         return;
       }
-      if (n && n.id === 'exportBtn') {
+      if ((n = hit('#exportBtn'))) {
         var box = el('#ioBox');
         if (box) { box.value = S.exportJSON(); box.select(); toast('存档已生成，可直接复制保存'); }
         return;
       }
-      if (n && n.id === 'importBtn') {
+      if ((n = hit('#importBtn'))) {
         var box2 = el('#ioBox');
         if (box2 && box2.value.trim()) {
           if (S.importJSON(box2.value)) { toast('导入成功'); render(); }
@@ -328,7 +398,7 @@
         }
         return;
       }
-      if (n && n.id === 'resetBtn') {
+      if ((n = hit('#resetBtn'))) {
         if (confirm('会清空所有任务和解锁记录，确定吗？')) {
           S.resetAll();
           toast('已恢复出厂设置');
@@ -338,6 +408,26 @@
       }
       if ((n = hit('[data-lockbtn]'))) { checkPin(); return; }
     });
+
+    /* 表单联动：勾选奖励实时计数、星星币实时换算 */
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t && t.closest && t.closest('.rw-picker')) rwCount();
+      if (t && t.id === 'ntStar') syncStarNum();
+    });
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t && t.id === 'ntStar') syncStarNum();
+    });
+  }
+
+  function syncStarNum() {
+    var s = el('#ntStar'), b = el('#ntStarNum');
+    if (!s || !b) return;
+    var v = parseInt(s.value, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    if (v > 10) v = 10;
+    b.textContent = v * 10;
   }
 
   function checkPin() {

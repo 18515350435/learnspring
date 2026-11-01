@@ -652,12 +652,36 @@
 
   function cheatOn() { return !!st.cheat; }
 
-  function addCustomTask(title, desc, rewards) {
-    var id = 'c' + Date.now().toString(36);
-    st.customTasks.unshift({ id: id, title: title, desc: desc || '', tag: '自定义', custom: true, rewards: rewards || [] });
+  function addCustomTask(title, desc, rewards, star) {
+    var id = 'c' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+    st.customTasks.unshift({
+      id: id,
+      title: title,
+      desc: desc || '',
+      tag: '自定义',
+      custom: true,
+      rewards: rewards || [],
+      star: Math.max(1, Math.min(10, parseInt(star, 10) || 1))
+    });
     log('新增任务', title);
     notify();
     return id;
+  }
+
+  /* 修改自定义任务：保留原 id，避免已提交/已审核的记录断链 */
+  function updateCustomTask(id, title, desc, rewards, star) {
+    var t = null;
+    st.customTasks.forEach(function (x) { if (x.id === id) t = x; });
+    if (!t) return false;
+    t.title = title;
+    t.desc = desc || '';
+    t.tag = t.tag || '自定义';
+    t.custom = true;
+    t.rewards = rewards || [];
+    t.star = Math.max(1, Math.min(10, parseInt(star, 10) || 1));
+    log('修改任务', title);
+    notify();
+    return true;
   }
 
   function removeCustomTask(id) {
@@ -758,6 +782,7 @@
     setCheat: setCheat,
     cheatOn: cheatOn,
     addCustomTask: addCustomTask,
+    updateCustomTask: updateCustomTask,
     removeCustomTask: removeCustomTask,
     stars: function () { return st.stars; },
     addStars: addStars,
