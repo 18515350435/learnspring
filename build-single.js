@@ -240,11 +240,7 @@ const html = '<!DOCTYPE html>\n' +
   header(true) + '\n' +
   '  <div class="wrap lock" id="lockScreen">\n' +
   '    <div class="lock-card">\n' +
-  '      <h2>家长验证</h2>\n' +
-  '      <p class="muted">请输入管理端密码后进入（初始密码 1234，可在「数据与设置」里修改）。</p>\n' +
-  '      <input id="pinField" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="管理端密码">\n' +
-  '      <p class="pin-err" id="pinErr"></p>\n' +
-  '      <button class="btn primary" id="pinBtn" data-lockbtn type="button">进入</button>\n' +
+  '      <div id="lockBox"></div>\n' +
   '    </div>\n' +
   '  </div>\n' +
   '  <main class="wrap main" id="adminBody" style="display:none">\n' +

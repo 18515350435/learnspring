@@ -179,6 +179,21 @@ p { margin: 0 0 .8em; }
 }
 .ipt:focus { outline: none; border-color: var(--c-primary); }
 .ipt.big { font-size: 16px; padding: 11px 14px; text-align: center; letter-spacing: 4px; }
+select.ipt { width: auto; min-width: 120px; padding: 9px 32px 9px 12px; letter-spacing: 0; text-align: left; }
+
+/* 家长端：口算题 */
+.quiz-q {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--c-primary);
+  text-align: center;
+  margin: 14px 0 16px;
+  padding: 14px 10px;
+  background: #fff6fb;
+  border: 1px dashed #f3c6e2;
+  border-radius: var(--radius-sm);
+}
 
 .ta {
   width: 100%;

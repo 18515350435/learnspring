@@ -194,7 +194,7 @@
     { id: 'a-memory', name: '记忆大师', desc: '12 步内完成记忆翻牌', stars: 40 },
     { id: 'a-streak7', name: '坚持不懈', desc: '连续打卡 7 天', stars: 60 },
     { id: 'a-photo', name: '小小摄影师', desc: '拍下 3 张家园照片', stars: 30 },
-    { id: 'a-full', name: '满分照料', desc: '所有小马四项需求都超过 80', stars: 60 },
+    { id: 'a-full', name: '满分照料', desc: '照料满 3 次，且所有小马四项需求都超过 80', stars: 60 },
     { id: 'a-level5', name: '成长之路', desc: '等级达到 5 级', stars: 60 },
     { id: 'a-potty', name: '自己会上厕所', desc: '第一次带小马用马桶', stars: 30 },
     { id: 'a-wash', name: '讲卫生的好孩子', desc: '上完厕所洗手 10 次', stars: 50 }

@@ -7,6 +7,9 @@
   var D = window.DATA, S = window.Store;
   var tab = 'review';
   var unlockedUI = false;
+  /* 锁屏流程：quiz0（没设密码，先答题）→ setup → 进入；已设密码：pin → quiz → 进入 */
+  var lockStage = S.pinReady() ? 'pin' : 'quiz0';
+  var quiz = null;
 
   var STATUS_TEXT = { todo: '未开始', pending: '待审核', approved: '已通过', rejected: '已驳回' };
 
@@ -157,9 +160,15 @@
       '</div>' +
       '<div class="form-row">' +
       '  <label>管理端密码</label>' +
-      '  <input id="pinInput" class="ipt" value="' + esc(st.pin) + '" maxlength="8" inputmode="numeric">' +
+      '  <input id="pinInput" class="ipt" type="password" maxlength="8" inputmode="numeric" placeholder="4～8 位数字，留空表示不修改">' +
       '  <button class="btn primary sm" id="savePin" type="button">保存</button>' +
       '</div>' +
+      '<div class="form-row">' +
+      '  <label>孩子年级</label>' +
+      '  <select id="gradeSelect" class="ipt">' + gradeOptions(st.grade) + '</select>' +
+      '  <button class="btn primary sm" id="saveGrade" type="button">保存</button>' +
+      '</div>' +
+      '<p class="muted sm">年级决定进管理端那道口算题的难度：1-2 年级表内乘除，3-4 年级两位数×一位数，5-6 年级两位数×两位数。</p>' +
       '<h3 class="sec-title">统计</h3>' +
       '<div class="stat-grid">' +
       [['待完成', s.todo], ['待审核', s.pending], ['已通过', s.approved], ['已驳回', s.rejected],
@@ -382,7 +391,11 @@
       }
       if ((n = hit('#savePin'))) {
         var pi = el('#pinInput');
-        if (pi) { S.state().pin = pi.value.trim() || '1234'; S.save(); toast('密码已更新'); }
+        if (!pi) return;
+        var pv = pi.value.trim();
+        if (!pv) { toast('没改密码'); return; }
+        if (S.setPin(pv)) { pi.value = ''; toast('密码已更新'); }
+        else toast('密码要 4～8 位数字');
         return;
       }
       if ((n = hit('#exportBtn'))) {
@@ -406,7 +419,11 @@
         }
         return;
       }
-      if ((n = hit('[data-lockbtn]'))) { checkPin(); return; }
+      if ((n = hit('#saveGrade'))) {
+        var gsel = el('#gradeSelect');
+        if (gsel && S.setGrade(gsel.value)) toast('已更新年级，口算题难度同步调整');
+        return;
+      }
     });
 
     /* 表单联动：勾选奖励实时计数、星星币实时换算 */
@@ -430,16 +447,108 @@
     b.textContent = v * 10;
   }
 
-  function checkPin() {
-    var v = el('#pinField').value.trim();
-    if (v === S.state().pin) {
-      unlockedUI = true;
-      el('#lockScreen').style.display = 'none';
-      el('#adminBody').style.display = '';
-      render();
+  /* ---------- 口算题 ---------- */
+
+  function rnd(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+
+  /* 按年级出一道乘除题，除法保证整除 */
+  function makeQuiz(grade) {
+    var g = grade || S.grade();
+    var a, b, hi1, hi2;
+    if (g <= 2) { hi1 = [2, 9]; hi2 = [2, 9]; }        /* 表内乘除 */
+    else if (g <= 4) { hi1 = [11, 39]; hi2 = [2, 9]; } /* 两位数 × 一位数 */
+    else { hi1 = [11, 25]; hi2 = [11, 19]; }           /* 两位数 × 两位数 */
+    a = rnd(hi1[0], hi1[1]);
+    b = rnd(hi2[0], hi2[1]);
+    if (Math.random() < 0.5) return { q: a + ' × ' + b + ' = ?', a: a * b };
+    return { q: (a * b) + ' ÷ ' + b + ' = ?', a: a };
+  }
+
+  function gradeOptions(cur) {
+    var names = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+    return names.map(function (n, i) {
+      return '<option value="' + (i + 1) + '"' + (cur === i + 1 ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+  }
+
+  /* ---------- 锁屏 ---------- */
+
+  function renderLock() {
+    var box = el('#lockBox');
+    if (!box) return;
+    var h = '';
+    if (lockStage === 'quiz0' || lockStage === 'quiz') {
+      if (!quiz) quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade());
+      h = '<h2>家长验证 · 口算</h2>' +
+        '<p class="muted">' + (lockStage === 'quiz0'
+          ? '还没设置过管理端密码。请先答对这道题，再设置密码。'
+          : '答对这道题才能进入管理端（题目难度按孩子年级来）。') + '</p>' +
+        '<p class="quiz-q" id="quizText">' + quiz.q + '</p>' +
+        '<input id="lkInput" class="ipt big" type="text" inputmode="numeric" maxlength="6" placeholder="答案" autocomplete="off">' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">确定</button>' +
+        '<button class="btn ghost sm" id="lkNew" type="button">换一题</button>';
+    } else if (lockStage === 'setup') {
+      h = '<h2>设置管理端密码</h2>' +
+        '<p class="muted">4～8 位数字。设置后只有答对口算题 + 输对密码才能进管理端。</p>' +
+        '<input id="lkPin" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="新密码" autocomplete="off">' +
+        '<input id="lkPin2" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="再输一次" autocomplete="off">' +
+        '<div class="form-row"><label>孩子年级</label>' +
+        '<select id="lkGrade" class="ipt">' + gradeOptions(S.grade()) + '</select></div>' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">保存并进入</button>';
     } else {
-      var err = el('#pinErr');
-      if (err) err.textContent = '密码不对，再想想～';
+      h = '<h2>家长验证</h2>' +
+        '<p class="muted">请输入管理端密码。</p>' +
+        '<input id="lkInput" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="管理端密码">' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">下一步</button>';
+    }
+    box.innerHTML = h;
+  }
+
+  function lockErr(msg) {
+    var e = el('#lkErr');
+    if (e) e.textContent = msg;
+  }
+
+  function unlock() {
+    unlockedUI = true;
+    var s = el('#lockScreen');
+    if (s) s.style.display = 'none';
+    var b = el('#adminBody');
+    if (b) b.style.display = '';
+    render();
+  }
+
+  function lockNext() {
+    if (lockStage === 'pin') {
+      var v = el('#lkInput') ? el('#lkInput').value.trim() : '';
+      if (v !== S.state().pin) { lockErr('密码不对，再想想～'); return; }
+      lockStage = 'quiz'; quiz = null; renderLock(); return;
+    }
+    if (lockStage === 'quiz0' || lockStage === 'quiz') {
+      var s = el('#lkInput') ? el('#lkInput').value.trim() : '';
+      if (!quiz) quiz = makeQuiz(S.grade());
+      if (s === '' || parseInt(s, 10) !== quiz.a) {
+        lockErr('算错了，再试一道～');
+        quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade());
+        renderLock();
+        return;
+      }
+      if (lockStage === 'quiz0') { lockStage = 'setup'; renderLock(); }
+      else unlock();
+      return;
+    }
+    if (lockStage === 'setup') {
+      var p1 = el('#lkPin') ? el('#lkPin').value.trim() : '';
+      var p2 = el('#lkPin2') ? el('#lkPin2').value.trim() : '';
+      if (!/^\d{4,8}$/.test(p1)) { lockErr('密码要 4～8 位数字'); return; }
+      if (p1 !== p2) { lockErr('两次输入的密码不一样'); return; }
+      var gEl = el('#lkGrade');
+      if (gEl) S.setGrade(gEl.value);
+      S.setPin(p1);
+      unlock();
     }
   }
 
@@ -464,10 +573,21 @@
   document.addEventListener('DOMContentLoaded', function () {
     bind();
     renderCheatBtn();
-    var btn = el('#pinBtn');
-    if (btn) btn.addEventListener('click', checkPin);
-    var f = el('#pinField');
-    if (f) f.addEventListener('keydown', function (e) { if (e.key === 'Enter') checkPin(); });
+    renderLock();
+
+    /* 锁屏上的按钮：确定 / 换一题 */
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.id) return;
+      if (t.id === 'lkOk') lockNext();
+      else if (t.id === 'lkNew') { quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade()); renderLock(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var a = document.activeElement;
+      if (a && (a.id === 'lkInput' || a.id === 'lkPin' || a.id === 'lkPin2')) lockNext();
+    });
+
     S.onChange(function (_, external) { if (external && unlockedUI) render(); });
   });
 })();

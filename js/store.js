@@ -42,7 +42,10 @@
     return {
       v: 1,
       player: '小朋友',
-      pin: '1234',
+      /* 不再内置默认密码：为空表示「还没设置」，首次进家长端时强制设置 */
+      pin: '',
+      /* 孩子年级 1-6，决定家长端口算题难度 */
+      grade: 3,
       activePony: 'twilight',
       outfit: { bg: 'bg-sky', wing: null, hair: null, forehead: null, headwear: null, glasses: null, eyes: null, cheek: null, neck: null },
       unlocks: { items: initials('item'), ponies: initials('pony') },
@@ -131,6 +134,29 @@
     if (typeof st.home.day !== 'boolean') st.home.day = true;
     if (typeof st.home.pets !== 'number') st.home.pets = 0;
     if (typeof st.home.sound !== 'boolean') st.home.sound = true;
+    if (typeof st.grade !== 'number' || st.grade < 1 || st.grade > 6) st.grade = 3;
+  }
+
+  /* 历史版本内置过默认密码 1234，视同「未设置」，强制家长改一次 */
+  var LEGACY_PIN = '1234';
+  function pinReady() { return !!st.pin && st.pin !== LEGACY_PIN; }
+
+  function setPin(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!/^\d{4,8}$/.test(s)) return false;
+    st.pin = s;
+    notify();
+    return true;
+  }
+
+  function grade() { return st.grade; }
+
+  function setGrade(n) {
+    n = parseInt(n, 10);
+    if (isNaN(n) || n < 1 || n > 6) return false;
+    st.grade = n;
+    notify();
+    return true;
   }
 
   function save() {
@@ -505,7 +531,8 @@
     if (st.gameBest.memory > 0 && st.gameBest.memory <= 12) got = grant('a-memory') || got;
     if (st.checkin.streak >= 7) got = grant('a-streak7') || got;
     if (st.album.length >= 3) got = grant('a-photo') || got;
-    if (allNeedsOk) got = grant('a-full') || got;
+    /* 必须真的照料过：新存档需求初始就是满值，不加这个条件开局就白送 60 星 */
+    if (allNeedsOk && st.home.pets >= 3) got = grant('a-full') || got;
     if (st.level >= 5) got = grant('a-level5') || got;
     if (st.potty && st.potty.uses >= 1) got = grant('a-potty') || got;
     if (st.potty && st.potty.washes >= 10) got = grant('a-wash') || got;
@@ -763,6 +790,10 @@
   window.Store = {
     key: KEY,
     ok: function () { return storageOK; },
+    pinReady: pinReady,
+    setPin: setPin,
+    grade: grade,
+    setGrade: setGrade,
     state: function () { return st; },
     save: notify,
     onChange: function (fn) { listeners.push(fn); },
