@@ -189,6 +189,21 @@ p { margin: 0 0 .8em; }
 }
 .ipt:focus { outline: none; border-color: var(--c-primary); }
 .ipt.big { font-size: 16px; padding: 11px 14px; text-align: center; letter-spacing: 4px; }
+select.ipt { width: auto; min-width: 120px; padding: 9px 32px 9px 12px; letter-spacing: 0; text-align: left; }
+
+/* 家长端：口算题 */
+.quiz-q {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--c-primary);
+  text-align: center;
+  margin: 14px 0 16px;
+  padding: 14px 10px;
+  background: #fff6fb;
+  border: 1px dashed #f3c6e2;
+  border-radius: var(--radius-sm);
+}
 
 .ta {
   width: 100%;
@@ -676,6 +691,14 @@ p { margin: 0 0 .8em; }
 .sm-ipt { width: 84px !important; }
 .fr-label { font-size: 13px; color: var(--c-muted); }
 .tdesc { display: block; font-style: normal; font-size: 11.5px; color: var(--c-muted); margin-top: 2px; }
+
+/* 云同步（家长端） */
+.cloud-form { max-width: 460px; }
+.cloud-code { font-family: ui-monospace, Consolas, monospace; letter-spacing: 1px; font-size: 14px; }
+.cloud-state { margin: 6px 0 10px; font-size: 12.5px; color: var(--c-muted); }
+.cloud-state.cloud-ok { color: #2e9e5b; }
+.cloud-state.cloud-err { color: #e0519c; }
+details > summary { cursor: pointer; margin-bottom: 8px; }
 
 /* ===== 小马家园 ===== */
 .home-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
@@ -1180,9 +1203,10 @@ p { margin: 0 0 .8em; }
 
 </style>
 <style>
-
 /* ============================================================
-   手机版增强（仅单文件版注入）
+   手机 / 触摸端增强
+   index.html 与 admin.html 直接引用本文件；
+   build-single.js 也读同一份，保证单文件版和多文件版表现一致。
    ============================================================ */
 html { -webkit-text-size-adjust: 100%; }
 body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
@@ -1291,11 +1315,7 @@ body {
 <header class="app-header admin">  <div class="wrap head-wrap">    <div class="brand">      <span class="brand-mark admin"></span>      <span class="brand-text">        <b>家长管理端</b>        <i>审核任务 · 管理解锁 · 自定义奖励</i>      </span>    </div>    <nav class="nav">      <button class="nav-btn" data-atab="review" type="button">待审核<em id="adminBadge" class="dot">0</em></button>      <button class="nav-btn" data-atab="tasks" type="button">任务总览</button>      <button class="nav-btn" data-atab="manage" type="button">解锁管理</button>      <button class="nav-btn" data-atab="data" type="button">数据与设置</button>      <button class="nav-btn cheat-btn" id="cheatBtnAdmin" data-cheat type="button">🔒 破解开关</button>      <button class="nav-btn alt" data-mode="player" type="button">← 返回玩家端</button>    </nav>    <div class="who"><i>审核身份</i><b>家长</b></div>  </div></header>
   <div class="wrap lock" id="lockScreen">
     <div class="lock-card">
-      <h2>家长验证</h2>
-      <p class="muted">请输入管理端密码后进入（初始密码 1234，可在「数据与设置」里修改）。</p>
-      <input id="pinField" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="管理端密码">
-      <p class="pin-err" id="pinErr"></p>
-      <button class="btn primary" id="pinBtn" data-lockbtn type="button">进入</button>
+      <div id="lockBox"></div>
     </div>
   </div>
   <main class="wrap main" id="adminBody" style="display:none">
@@ -1505,7 +1525,7 @@ body {
     { id: 'a-memory', name: '记忆大师', desc: '12 步内完成记忆翻牌', stars: 40 },
     { id: 'a-streak7', name: '坚持不懈', desc: '连续打卡 7 天', stars: 60 },
     { id: 'a-photo', name: '小小摄影师', desc: '拍下 3 张家园照片', stars: 30 },
-    { id: 'a-full', name: '满分照料', desc: '所有小马四项需求都超过 80', stars: 60 },
+    { id: 'a-full', name: '满分照料', desc: '照料满 3 次，且所有小马四项需求都超过 80', stars: 60 },
     { id: 'a-level5', name: '成长之路', desc: '等级达到 5 级', stars: 60 },
     { id: 'a-potty', name: '自己会上厕所', desc: '第一次带小马用马桶', stars: 30 },
     { id: 'a-wash', name: '讲卫生的好孩子', desc: '上完厕所洗手 10 次', stars: 50 }
@@ -2010,6 +2030,236 @@ body {
 
 </script>
 <script>
+/* ===== js/cloud.js ===== */
+/**
+ * 云同步（Supabase）—— 存档云端备份 / 多设备恢复
+ *
+ * 前端直连 Supabase REST（无 SDK 依赖，fetch 即可）：
+ * - 配置（项目 URL / anon key / 同步码）由家长在「数据与设置」里粘贴，
+ *   存 localStorage（pony_cloud_v2），不写进公开仓库
+ * - 表结构（需在 Supabase SQL Editor 里执行一次，见 README）：
+ *     create table saves (code text primary key, data jsonb not null,
+ *                          updated_at timestamptz not null default now());
+ *     alter table saves enable row level security;
+ *     create policy "saves_all" on saves for all to anon using (true) with check (true);
+ * - 策略：本地每次存档（notify）防抖 2.5s 上传；启动时拉取，
+ *   云端 savedAt 更新则整档恢复（最后写入者优先）
+ * - anon key 本就设计为可公开（靠 RLS 保护），同步码随机 10 位不可猜
+ */
+(function () {
+  'use strict';
+
+  var CFG_KEY = 'pony_cloud_v2';
+  var DEBOUNCE = 2500;
+  var TIMEOUT = 12000;
+
+  var cfg = null;          /* { url, key, code } */
+  var status = { state: 'off', msg: '', at: 0 };  /* off | ok | syncing | err */
+  var pushTimer = 0;
+  var inflight = false;    /* 上传进行中（合并后续触发） */
+  var pulling = false;     /* 拉取中（避免拉取触发的 save 又被推回去） */
+  var lastPushed = '';     /* 上次成功上传的内容，避免重复推 */
+
+  /* ---------- 配置 ---------- */
+
+  function readCfg() {
+    try {
+      var raw = localStorage.getItem(CFG_KEY);
+      var o = raw ? JSON.parse(raw) : null;
+      if (o && typeof o === 'object' && o.url && o.key && o.code) return o;
+    } catch (e) {}
+    return null;
+  }
+
+  function writeCfg() {
+    try {
+      if (cfg) localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+      else localStorage.removeItem(CFG_KEY);
+    } catch (e) {}
+  }
+
+  function validUrl(u) {
+    return /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+\/?$/i.test(String(u || '').trim().replace(/\/+$/, '')) &&
+      String(u || '').trim().replace(/\/+$/, '');
+  }
+
+  function validKey(k) {
+    return /^[A-Za-z0-9._-]{20,}$/.test(String(k || '').trim()) && String(k).trim();
+  }
+
+  /* 随机同步码：去掉易混淆字符（0/O/1/I/L），10 位 */
+  function newCode() {
+    var chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    var s = '';
+    for (var i = 0; i < 10; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return s;
+  }
+
+  function validCode(c) {
+    return /^[A-Z0-9]{6,16}$/.test(String(c || '').trim().toUpperCase()) && String(c).trim().toUpperCase();
+  }
+
+  /* ---------- REST ---------- */
+
+  function api(path, opts) {
+    if (!cfg) return Promise.reject(new Error('还没配置云同步'));
+    var base = cfg.url.replace(/\/+$/, '');
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, TIMEOUT);
+    return fetch(base + path, {
+      method: opts.method,
+      headers: {
+        'apikey': cfg.key,
+        'Authorization': 'Bearer ' + cfg.key,
+        'Content-Type': 'application/json',
+        'Prefer': opts.prefer || ''
+      },
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: ctl ? ctl.signal : undefined
+    }).then(function (r) {
+      clearTimeout(timer);
+      if (!r.ok) return r.text().catch(function () { return ''; }).then(function (t) {
+        throw new Error('HTTP ' + r.status + (t ? ' ' + t.slice(0, 120) : ''));
+      });
+      return r.status === 204 ? null : r.json();
+    }).catch(function (e) {
+      clearTimeout(timer);
+      if (e && e.name === 'AbortError') throw new Error('请求超时');
+      throw e;
+    });
+  }
+
+  function setState(s, msg) {
+    status = { state: s, msg: msg || '', at: Date.now() };
+    listeners.forEach(function (fn) { try { fn(status); } catch (e) {} });
+  }
+
+  /* ---------- 上传 / 下载 ---------- */
+
+  function payload() {
+    var S = window.Store;
+    return { code: cfg.code, data: JSON.parse(S.exportJSON()), updated_at: new Date().toISOString() };
+  }
+
+  function pushNow() {
+    if (!cfg) return Promise.reject(new Error('还没配置云同步'));
+    if (pulling) return Promise.resolve(false);
+    var body = payload();
+    var text = JSON.stringify(body.data);
+    if (text === lastPushed) return Promise.resolve(false);
+    inflight = true;
+    setState('syncing', '正在上传…');
+    return api('/rest/v1/saves', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates',
+      body: body
+    }).then(function () {
+      lastPushed = text;
+      setState('ok', '已同步 ' + fmtTime());
+      inflight = false;
+      return true;
+    }).catch(function (e) {
+      setState('err', '上传失败：' + (e.message || e));
+      inflight = false;
+      throw e;
+    });
+  }
+
+  /* onSave：store.notify() 时调，防抖合并 */
+  function onSave() {
+    if (!cfg || pulling) return;
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      pushTimer = 0;
+      pushNow().catch(function () { /* 状态已记录，等下次存档重试 */ });
+    }, DEBOUNCE);
+  }
+
+  function pullNow(force) {
+    if (!cfg) return Promise.reject(new Error('还没配置云同步'));
+    if (pulling) return Promise.resolve(false);
+    pulling = true;
+    setState('syncing', '正在检查云端…');
+    return api('/rest/v1/saves?select=data&code=eq.' + encodeURIComponent(cfg.code), { method: 'GET' })
+      .then(function (rows) {
+        pulling = false;
+        if (!rows || !rows.length) { setState('ok', '云端还没有存档'); return false; }
+        var remote = rows[0].data;
+        var S = window.Store;
+        var local = S.state();
+        var remoteAt = remote && typeof remote.savedAt === 'number' ? remote.savedAt : 0;
+        var localAt = local && typeof local.savedAt === 'number' ? local.savedAt : 0;
+        if (!force && remoteAt <= localAt) { setState('ok', '云端无新版本 ' + fmtTime()); return false; }
+        /* 云端更新（或手动强制）：整档恢复 */
+        pulling = true;              /* 恢复过程触发的 notify 不要回推 */
+        var ok = S.importJSON(JSON.stringify(remote));
+        pulling = false;
+        if (!ok) { setState('err', '云端存档格式不对'); return false; }
+        lastPushed = JSON.stringify(remote);   /* 内容一致，无需再推 */
+        setState('ok', '已恢复云端存档 ' + fmtTime());
+        return true;
+      })
+      .catch(function (e) {
+        pulling = false;
+        setState('err', '下载失败：' + (e.message || e));
+        throw e;
+      });
+  }
+
+  /* 启动：配置过就检查一次云端（不弹错误打扰孩子，只在家长端看状态） */
+  function startup() {
+    if (!cfg) return;
+    pullNow().catch(function () {});
+  }
+
+  /* ---------- 对外 ---------- */
+
+  var listeners = [];
+  function fmtTime() {
+    var d = new Date();
+    function p(n) { return n < 10 ? '0' + n : n; }
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  cfg = readCfg();
+
+  window.Cloud = {
+    configured: function () { return !!cfg; },
+    cfg: function () { return cfg ? { url: cfg.url, code: cfg.code, key: cfg.key.slice(0, 8) + '…' } : null; },
+    info: function () { return status; },
+    newCode: newCode,
+    onChange: function (fn) { listeners.push(fn); },
+    onSave: onSave,
+    startup: startup,
+    pushNow: function () { return pushNow(); },
+    pullNow: function () { return pullNow(true); },
+    /* 家长端保存配置：url/key/code 全量校验；key 留空且是修改配置时沿用旧值 */
+    setCfg: function (url, key, code) {
+      var u = validUrl(url), c = validCode(code);
+      if (!u) return '项目 URL 不对，应形如 https://xxxx.supabase.co';
+      if (!c) return '同步码应为 6~16 位字母数字';
+      var k = key ? validKey(key) : '';
+      if (!k) {
+        if (cfg && cfg.url) k = cfg.key;          /* 修改配置：留空沿用 */
+        else return 'anon key 不对（长度或字符不符合）';
+      }
+      cfg = { url: u, key: k, code: c };
+      writeCfg();
+      lastPushed = '';
+      setState('ok', '配置已保存');
+      return true;
+    },
+    clearCfg: function () {
+      cfg = null;
+      writeCfg();
+      setState('off', '');
+      return true;
+    }
+  };
+})();
+
+</script>
+<script>
 /* ===== js/store.js ===== */
 /**
  * 共享存储层 + 任务状态机
@@ -2055,7 +2305,12 @@ body {
     return {
       v: 1,
       player: '小朋友',
-      pin: '1234',
+      /* 云同步版本号：每次实际变更（notify）时更新，用于和云端比新旧；0 表示全新档 */
+      savedAt: 0,
+      /* 不再内置默认密码：为空表示「还没设置」，首次进家长端时强制设置 */
+      pin: '',
+      /* 孩子年级 1-6，决定家长端口算题难度 */
+      grade: 3,
       activePony: 'twilight',
       outfit: { bg: 'bg-sky', wing: null, hair: null, forehead: null, headwear: null, glasses: null, eyes: null, cheek: null, neck: null },
       unlocks: { items: initials('item'), ponies: initials('pony') },
@@ -2095,12 +2350,17 @@ body {
 
   function load() {
     var raw = readRaw();
-    if (!raw) { st = seed(); save(); return; }
+    if (!raw) { st = seed(); migrate(); save(); return; }
     try {
       st = JSON.parse(raw);
     } catch (e) {
       st = seed();
     }
+    migrate();
+  }
+
+  /* 结构补全，兼容旧版本存档（对 st 原地修补，不回读 localStorage） */
+  function migrate() {
     /* 结构补全，兼容旧版本 */
     var base = seed();
     Object.keys(base).forEach(function (k) {
@@ -2144,6 +2404,29 @@ body {
     if (typeof st.home.day !== 'boolean') st.home.day = true;
     if (typeof st.home.pets !== 'number') st.home.pets = 0;
     if (typeof st.home.sound !== 'boolean') st.home.sound = true;
+    if (typeof st.grade !== 'number' || st.grade < 1 || st.grade > 6) st.grade = 3;
+  }
+
+  /* 历史版本内置过默认密码 1234，视同「未设置」，强制家长改一次 */
+  var LEGACY_PIN = '1234';
+  function pinReady() { return !!st.pin && st.pin !== LEGACY_PIN; }
+
+  function setPin(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!/^\d{4,8}$/.test(s)) return false;
+    st.pin = s;
+    notify();
+    return true;
+  }
+
+  function grade() { return st.grade; }
+
+  function setGrade(n) {
+    n = parseInt(n, 10);
+    if (isNaN(n) || n < 1 || n > 6) return false;
+    st.grade = n;
+    notify();
+    return true;
   }
 
   function save() {
@@ -2152,8 +2435,11 @@ body {
   }
 
   function notify() {
+    st.savedAt = Date.now();
     save();
     listeners.forEach(function (fn) { fn(st); });
+    /* 云同步：防抖上传（cloud.js 在 store 之前加载，多一层保护） */
+    if (window.Cloud && window.Cloud.onSave) { try { window.Cloud.onSave(); } catch (e) {} }
   }
 
   /* ---------- 查询 ---------- */
@@ -2518,7 +2804,8 @@ body {
     if (st.gameBest.memory > 0 && st.gameBest.memory <= 12) got = grant('a-memory') || got;
     if (st.checkin.streak >= 7) got = grant('a-streak7') || got;
     if (st.album.length >= 3) got = grant('a-photo') || got;
-    if (allNeedsOk) got = grant('a-full') || got;
+    /* 必须真的照料过：新存档需求初始就是满值，不加这个条件开局就白送 60 星 */
+    if (allNeedsOk && st.home.pets >= 3) got = grant('a-full') || got;
     if (st.level >= 5) got = grant('a-level5') || got;
     if (st.potty && st.potty.uses >= 1) got = grant('a-potty') || got;
     if (st.potty && st.potty.washes >= 10) got = grant('a-wash') || got;
@@ -2747,7 +3034,9 @@ body {
       var o = JSON.parse(text);
       if (!o || typeof o !== 'object' || !o.unlocks) return false;
       st = o;
-      load();
+      /* 只做结构补全。原实现这里误调 load()，会从 localStorage 把旧档读回来，
+         导致「导入存档」和云同步恢复都实际不生效（已修复） */
+      migrate();
       notify();
       return true;
     } catch (e) {
@@ -2772,10 +3061,16 @@ body {
   load();
   decayNeeds();
   save();
+  /* 启动时检查云端有没有更新的存档（已配置云同步才生效） */
+  if (window.Cloud && window.Cloud.startup) { try { window.Cloud.startup(); } catch (e) {} }
 
   window.Store = {
     key: KEY,
     ok: function () { return storageOK; },
+    pinReady: pinReady,
+    setPin: setPin,
+    grade: grade,
+    setGrade: setGrade,
     state: function () { return st; },
     save: notify,
     onChange: function (fn) { listeners.push(fn); },
@@ -5079,6 +5374,9 @@ body {
   var D = window.DATA, S = window.Store;
   var tab = 'review';
   var unlockedUI = false;
+  /* 锁屏流程：quiz0（没设密码，先答题）→ setup → 进入；已设密码：pin → quiz → 进入 */
+  var lockStage = S.pinReady() ? 'pin' : 'quiz0';
+  var quiz = null;
 
   var STATUS_TEXT = { todo: '未开始', pending: '待审核', approved: '已通过', rejected: '已驳回' };
 
@@ -5229,9 +5527,15 @@ body {
       '</div>' +
       '<div class="form-row">' +
       '  <label>管理端密码</label>' +
-      '  <input id="pinInput" class="ipt" value="' + esc(st.pin) + '" maxlength="8" inputmode="numeric">' +
+      '  <input id="pinInput" class="ipt" type="password" maxlength="8" inputmode="numeric" placeholder="4～8 位数字，留空表示不修改">' +
       '  <button class="btn primary sm" id="savePin" type="button">保存</button>' +
       '</div>' +
+      '<div class="form-row">' +
+      '  <label>孩子年级</label>' +
+      '  <select id="gradeSelect" class="ipt">' + gradeOptions(st.grade) + '</select>' +
+      '  <button class="btn primary sm" id="saveGrade" type="button">保存</button>' +
+      '</div>' +
+      '<p class="muted sm">年级决定进管理端那道口算题的难度：1-2 年级表内乘除，3-4 年级两位数×一位数，5-6 年级两位数×两位数。</p>' +
       '<h3 class="sec-title">统计</h3>' +
       '<div class="stat-grid">' +
       [['待完成', s.todo], ['待审核', s.pending], ['已通过', s.approved], ['已驳回', s.rejected],
@@ -5262,12 +5566,74 @@ body {
       '  <button class="btn danger sm" id="resetBtn" type="button">恢复出厂</button>' +
       '</div>' +
       '<textarea id="ioBox" class="ta mono" rows="4" placeholder="导出的存档会显示在这里，也可以把存档文本粘贴进来再点导入。"></textarea>' +
+      cloudSection() +
       '<h3 class="sec-title">最近操作</h3>' +
       '<div class="log">' + (st.log.length ? st.log.slice(0, 12).map(function (l) {
         return '<div class="log-row"><span class="log-act">' + esc(l.action) + '</span>' +
           '<span class="log-detail">' + esc(l.detail) + '</span>' +
           '<span class="log-time">' + time(l.at) + '</span></div>';
       }).join('') : '<p class="muted">暂无记录</p>') + '</div>';
+  }
+
+  /* ---------- 云同步（Supabase） ---------- */
+
+  function cloudSection() {
+    var C = window.Cloud;
+    if (!C) return '';
+    var cfg = C.cfg();
+    var info = C.info();
+    var stateText = {
+      off: '未开启',
+      ok: info.msg || '已同步',
+      syncing: info.msg || '同步中…',
+      err: info.msg || '同步失败'
+    }[info.state] || '';
+    var stateCls = info.state === 'err' ? 'cloud-err' : (info.state === 'ok' ? 'cloud-ok' : '');
+
+    if (!cfg) {
+      return '<h3 class="sec-title">云同步（Supabase）</h3>' +
+        '<p class="muted">换手机 / 换电脑 / 清了浏览器缓存，存档也能找回来。配置一次即可，详见 README 的「云同步」章节。</p>' +
+        '<div class="form-col cloud-form">' +
+        '  <input id="clUrl" class="ipt" placeholder="项目 URL，形如 https://xxxxx.supabase.co">' +
+        '  <input id="clKey" class="ipt" placeholder="anon key（Settings → API 里复制）">' +
+        '  <div class="form-row">' +
+        '    <input id="clCode" class="ipt" placeholder="同步码（6~16 位字母数字）">' +
+        '    <button class="btn ghost sm" id="clGen" type="button">帮我生成</button>' +
+        '  </div>' +
+        '  <div class="form-row wrap">' +
+        '    <button class="btn primary sm" id="clSave" type="button">保存并开启</button>' +
+        '  </div>' +
+        '</div>';
+    }
+    return '<h3 class="sec-title">云同步（Supabase）· 已开启</h3>' +
+      '<p class="muted">同步码：<b class="cloud-code">' + esc(cfg.code) + '</b>（记到备忘录里，新设备上输入同一个码即可恢复）</p>' +
+      '<p class="cloud-state ' + stateCls + '">状态：' + esc(stateText) + '</p>' +
+      '<div class="form-row wrap">' +
+      '  <button class="btn ghost sm" id="clPush" type="button">立即上传</button>' +
+      '  <button class="btn ghost sm" id="clPull" type="button">从云端恢复</button>' +
+      '  <button class="btn danger sm" id="clOff" type="button">关闭云同步</button>' +
+      '</div>' +
+      '<details><summary class="muted sm">修改配置</summary>' +
+      '<div class="form-col cloud-form">' +
+      '  <input id="clUrl" class="ipt" placeholder="项目 URL" value="' + esc(cfg.url) + '">' +
+      '  <input id="clKey" class="ipt" placeholder="anon key（留空表示不修改）">' +
+      '  <div class="form-row">' +
+      '    <input id="clCode" class="ipt" value="' + esc(cfg.code) + '">' +
+      '  </div>' +
+      '  <div class="form-row wrap">' +
+      '    <button class="btn primary sm" id="clSave" type="button">保存修改</button>' +
+      '  </div>' +
+      '</div></details>';
+  }
+
+  function cloudRefresh() {
+    /* 只刷新状态行，避免整页重渲染打断输入 */
+    var box = el('.cloud-state');
+    if (!box || !window.Cloud) return;
+    var info = window.Cloud.info();
+    var stateText = { off: '未开启', ok: info.msg || '已同步', syncing: info.msg || '同步中…', err: info.msg || '同步失败' }[info.state] || '';
+    box.className = 'cloud-state ' + (info.state === 'err' ? 'cloud-err' : (info.state === 'ok' ? 'cloud-ok' : ''));
+    box.textContent = '状态：' + stateText;
   }
 
   /* ---------- 破解开关 ---------- */
@@ -5454,7 +5820,11 @@ body {
       }
       if ((n = hit('#savePin'))) {
         var pi = el('#pinInput');
-        if (pi) { S.state().pin = pi.value.trim() || '1234'; S.save(); toast('密码已更新'); }
+        if (!pi) return;
+        var pv = pi.value.trim();
+        if (!pv) { toast('没改密码'); return; }
+        if (S.setPin(pv)) { pi.value = ''; toast('密码已更新'); }
+        else toast('密码要 4～8 位数字');
         return;
       }
       if ((n = hit('#exportBtn'))) {
@@ -5478,7 +5848,53 @@ body {
         }
         return;
       }
-      if ((n = hit('[data-lockbtn]'))) { checkPin(); return; }
+
+      /* ---------- 云同步 ---------- */
+      if ((n = hit('#clGen'))) {
+        var gc = el('#clCode');
+        if (gc) { gc.value = window.Cloud.newCode(); gc.focus(); }
+        return;
+      }
+      if ((n = hit('#clSave'))) {
+        var cu = el('#clUrl'), ck = el('#clKey'), cc = el('#clCode');
+        var r = window.Cloud.setCfg(cu ? cu.value : '', ck ? ck.value.trim() : '', cc ? cc.value : '');
+        if (r !== true) { toast(r); return; }
+        toast('云同步已开启');
+        render();
+        /* 首次配置：云端有就恢复，没有就把当前存档推上去 */
+        window.Cloud.pullNow().then(function (got) {
+          if (!got) return window.Cloud.pushNow().catch(function () {});
+        }).catch(function () { /* 状态行已显示错误 */ });
+        return;
+      }
+      if ((n = hit('#clPush'))) {
+        window.Cloud.pushNow().then(function () {
+          toast('已上传到云端');
+          cloudRefresh();
+        }).catch(function (e) { toast('上传失败：' + (e.message || e)); cloudRefresh(); });
+        return;
+      }
+      if ((n = hit('#clPull'))) {
+        if (!confirm('用云端的存档覆盖本机吗？本机未同步的改动会丢失。')) return;
+        window.Cloud.pullNow().then(function (got) {
+          toast(got ? '已从云端恢复' : '云端没有存档');
+          render();
+        }).catch(function (e) { toast('恢复失败：' + (e.message || e)); cloudRefresh(); });
+        return;
+      }
+      if ((n = hit('#clOff'))) {
+        if (confirm('关闭后本机不再自动备份（云端数据保留）。确定吗？')) {
+          window.Cloud.clearCfg();
+          toast('云同步已关闭');
+          render();
+        }
+        return;
+      }
+      if ((n = hit('#saveGrade'))) {
+        var gsel = el('#gradeSelect');
+        if (gsel && S.setGrade(gsel.value)) toast('已更新年级，口算题难度同步调整');
+        return;
+      }
     });
 
     /* 表单联动：勾选奖励实时计数、星星币实时换算 */
@@ -5502,16 +5918,108 @@ body {
     b.textContent = v * 10;
   }
 
-  function checkPin() {
-    var v = el('#pinField').value.trim();
-    if (v === S.state().pin) {
-      unlockedUI = true;
-      el('#lockScreen').style.display = 'none';
-      el('#adminBody').style.display = '';
-      render();
+  /* ---------- 口算题 ---------- */
+
+  function rnd(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+
+  /* 按年级出一道乘除题，除法保证整除 */
+  function makeQuiz(grade) {
+    var g = grade || S.grade();
+    var a, b, hi1, hi2;
+    if (g <= 2) { hi1 = [2, 9]; hi2 = [2, 9]; }        /* 表内乘除 */
+    else if (g <= 4) { hi1 = [11, 39]; hi2 = [2, 9]; } /* 两位数 × 一位数 */
+    else { hi1 = [11, 25]; hi2 = [11, 19]; }           /* 两位数 × 两位数 */
+    a = rnd(hi1[0], hi1[1]);
+    b = rnd(hi2[0], hi2[1]);
+    if (Math.random() < 0.5) return { q: a + ' × ' + b + ' = ?', a: a * b };
+    return { q: (a * b) + ' ÷ ' + b + ' = ?', a: a };
+  }
+
+  function gradeOptions(cur) {
+    var names = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+    return names.map(function (n, i) {
+      return '<option value="' + (i + 1) + '"' + (cur === i + 1 ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+  }
+
+  /* ---------- 锁屏 ---------- */
+
+  function renderLock() {
+    var box = el('#lockBox');
+    if (!box) return;
+    var h = '';
+    if (lockStage === 'quiz0' || lockStage === 'quiz') {
+      if (!quiz) quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade());
+      h = '<h2>家长验证 · 口算</h2>' +
+        '<p class="muted">' + (lockStage === 'quiz0'
+          ? '还没设置过管理端密码。请先答对这道题，再设置密码。'
+          : '答对这道题才能进入管理端（题目难度按孩子年级来）。') + '</p>' +
+        '<p class="quiz-q" id="quizText">' + quiz.q + '</p>' +
+        '<input id="lkInput" class="ipt big" type="text" inputmode="numeric" maxlength="6" placeholder="答案" autocomplete="off">' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">确定</button>' +
+        '<button class="btn ghost sm" id="lkNew" type="button">换一题</button>';
+    } else if (lockStage === 'setup') {
+      h = '<h2>设置管理端密码</h2>' +
+        '<p class="muted">4～8 位数字。设置后只有答对口算题 + 输对密码才能进管理端。</p>' +
+        '<input id="lkPin" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="新密码" autocomplete="off">' +
+        '<input id="lkPin2" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="再输一次" autocomplete="off">' +
+        '<div class="form-row"><label>孩子年级</label>' +
+        '<select id="lkGrade" class="ipt">' + gradeOptions(S.grade()) + '</select></div>' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">保存并进入</button>';
     } else {
-      var err = el('#pinErr');
-      if (err) err.textContent = '密码不对，再想想～';
+      h = '<h2>家长验证</h2>' +
+        '<p class="muted">请输入管理端密码。</p>' +
+        '<input id="lkInput" class="ipt big" type="password" inputmode="numeric" maxlength="8" placeholder="管理端密码">' +
+        '<p class="pin-err" id="lkErr"></p>' +
+        '<button class="btn primary" id="lkOk" type="button">下一步</button>';
+    }
+    box.innerHTML = h;
+  }
+
+  function lockErr(msg) {
+    var e = el('#lkErr');
+    if (e) e.textContent = msg;
+  }
+
+  function unlock() {
+    unlockedUI = true;
+    var s = el('#lockScreen');
+    if (s) s.style.display = 'none';
+    var b = el('#adminBody');
+    if (b) b.style.display = '';
+    render();
+  }
+
+  function lockNext() {
+    if (lockStage === 'pin') {
+      var v = el('#lkInput') ? el('#lkInput').value.trim() : '';
+      if (v !== S.state().pin) { lockErr('密码不对，再想想～'); return; }
+      lockStage = 'quiz'; quiz = null; renderLock(); return;
+    }
+    if (lockStage === 'quiz0' || lockStage === 'quiz') {
+      var s = el('#lkInput') ? el('#lkInput').value.trim() : '';
+      if (!quiz) quiz = makeQuiz(S.grade());
+      if (s === '' || parseInt(s, 10) !== quiz.a) {
+        lockErr('算错了，再试一道～');
+        quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade());
+        renderLock();
+        return;
+      }
+      if (lockStage === 'quiz0') { lockStage = 'setup'; renderLock(); }
+      else unlock();
+      return;
+    }
+    if (lockStage === 'setup') {
+      var p1 = el('#lkPin') ? el('#lkPin').value.trim() : '';
+      var p2 = el('#lkPin2') ? el('#lkPin2').value.trim() : '';
+      if (!/^\d{4,8}$/.test(p1)) { lockErr('密码要 4～8 位数字'); return; }
+      if (p1 !== p2) { lockErr('两次输入的密码不一样'); return; }
+      var gEl = el('#lkGrade');
+      if (gEl) S.setGrade(gEl.value);
+      S.setPin(p1);
+      unlock();
     }
   }
 
@@ -5536,10 +6044,22 @@ body {
   document.addEventListener('DOMContentLoaded', function () {
     bind();
     renderCheatBtn();
-    var btn = el('#pinBtn');
-    if (btn) btn.addEventListener('click', checkPin);
-    var f = el('#pinField');
-    if (f) f.addEventListener('keydown', function (e) { if (e.key === 'Enter') checkPin(); });
+    renderLock();
+    if (window.Cloud) window.Cloud.onChange(function () { cloudRefresh(); });
+
+    /* 锁屏上的按钮：确定 / 换一题 */
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.id) return;
+      if (t.id === 'lkOk') lockNext();
+      else if (t.id === 'lkNew') { quiz = makeQuiz(lockStage === 'quiz0' ? 3 : S.grade()); renderLock(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var a = document.activeElement;
+      if (a && (a.id === 'lkInput' || a.id === 'lkPin' || a.id === 'lkPin2')) lockNext();
+    });
+
     S.onChange(function (_, external) { if (external && unlockedUI) render(); });
   });
 })();
