@@ -42,6 +42,8 @@
     return {
       v: 1,
       player: '小朋友',
+      /* 云同步版本号：每次实际变更（notify）时更新，用于和云端比新旧；0 表示全新档 */
+      savedAt: 0,
       /* 不再内置默认密码：为空表示「还没设置」，首次进家长端时强制设置 */
       pin: '',
       /* 孩子年级 1-6，决定家长端口算题难度 */
@@ -85,12 +87,17 @@
 
   function load() {
     var raw = readRaw();
-    if (!raw) { st = seed(); save(); return; }
+    if (!raw) { st = seed(); migrate(); save(); return; }
     try {
       st = JSON.parse(raw);
     } catch (e) {
       st = seed();
     }
+    migrate();
+  }
+
+  /* 结构补全，兼容旧版本存档（对 st 原地修补，不回读 localStorage） */
+  function migrate() {
     /* 结构补全，兼容旧版本 */
     var base = seed();
     Object.keys(base).forEach(function (k) {
@@ -165,8 +172,11 @@
   }
 
   function notify() {
+    st.savedAt = Date.now();
     save();
     listeners.forEach(function (fn) { fn(st); });
+    /* 云同步：防抖上传（cloud.js 在 store 之前加载，多一层保护） */
+    if (window.Cloud && window.Cloud.onSave) { try { window.Cloud.onSave(); } catch (e) {} }
   }
 
   /* ---------- 查询 ---------- */
@@ -761,7 +771,9 @@
       var o = JSON.parse(text);
       if (!o || typeof o !== 'object' || !o.unlocks) return false;
       st = o;
-      load();
+      /* 只做结构补全。原实现这里误调 load()，会从 localStorage 把旧档读回来，
+         导致「导入存档」和云同步恢复都实际不生效（已修复） */
+      migrate();
       notify();
       return true;
     } catch (e) {
@@ -786,6 +798,8 @@
   load();
   decayNeeds();
   save();
+  /* 启动时检查云端有没有更新的存档（已配置云同步才生效） */
+  if (window.Cloud && window.Cloud.startup) { try { window.Cloud.startup(); } catch (e) {} }
 
   window.Store = {
     key: KEY,

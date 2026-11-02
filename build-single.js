@@ -19,105 +19,12 @@ const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 /* ---------------- 1. 样式 ---------------- */
 
 const css = read('css/style.css');
-
-const MOBILE_CSS = `
-/* ============================================================
-   手机版增强（仅单文件版注入）
-   ============================================================ */
-html { -webkit-text-size-adjust: 100%; }
-body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
-[hidden] { display: none !important; }
-
-/* 触摸：按钮不做双击缩放；拖家具 / 抓星星时不带动页面滚动 */
-button, a, .nav-btn, .btn, .mem-card { touch-action: manipulation; }
-.furni-layer, .furni, .star-field, .fall-star { touch-action: none; }
-/* iOS 聚焦输入框时不要自动放大页面 */
-input, select, textarea, .ipt { font-size: 16px; }
-
-@media (max-width: 720px) {
-  .wrap { padding: 0 12px; }
-  .head-wrap { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
-  .brand-text i { display: none; }
-  .brand-text b { font-size: 15px; }
-
-  /* 8 个页签在手机上排不开，改成横向滑动 */
-  .nav {
-    width: 100%; margin-left: 0;
-    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
-    gap: 6px; padding: 2px 2px 8px; scrollbar-width: none;
-  }
-  .nav::-webkit-scrollbar { display: none; }
-  .nav-btn {
-    flex: 0 0 auto; white-space: nowrap;
-    font-size: 13px; padding: 9px 13px; min-height: 40px;
-    border-radius: 999px; border-color: var(--c-line); background: #fff;
-  }
-  .nav-btn.on { border-color: #ffc9e0; }
-  .who { width: 100%; justify-content: flex-end; margin-left: 0; font-size: 12px; }
-
-  /* 触摸目标放大到手指够得着 */
-  .btn { min-height: 44px; padding: 10px 16px; }
-  .btn.xs, .btn.sm { min-height: 38px; }
-  .pm-btn { min-height: 38px; padding: 8px 14px; font-size: 13px; }
-  .swatch { width: 34px; height: 34px; }
-
-  /* 家园 */
-  .room { min-height: 230px; border-width: 3px; border-radius: 16px; }
-  .hm-pony { width: 15%; min-width: 0; }
-  .hm-name { font-size: 10px; }
-  .hm-flag { font-size: 13px; }
-  .home-bar { gap: 6px 8px; }
-  .hstat { font-size: 12px; padding: 3px 10px; }
-  .home-tip { display: none; }
-  .home-tools { gap: 6px; }
-  .home-tools .btn { flex: 1 1 auto; min-height: 42px; font-size: 13px; }
-  .home-foot { flex-direction: column; gap: 4px; font-size: 12px; }
-  .snack { font-size: 17px; }
-  .pony-menu { left: 6px; right: 6px; bottom: 6px; width: auto; padding: 10px; }
-  .pony-card { width: 94%; max-height: 88vh; overflow-y: auto; }
-
-  /* 商店 */
-  .goods-grid { grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 10px; }
-  .shop-head { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .cat-tabs { flex-wrap: nowrap; overflow-x: auto; }
-  .cat { flex: 0 0 auto; }
-
-  /* 小游戏 */
-  .star-field { height: 320px; }
-  .fall-star { font-size: 30px; }
-  .mem-grid { grid-template-columns: repeat(4, 1fr); gap: 7px; }
-  .gp { min-height: 92px; }
-
-  /* 妆造台 / 图鉴 / 成就 / 相册 */
-  .studio { grid-template-columns: 1fr !important; }
-  .item-row, .mini-grid, .manage-grid, .stat-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
-  .pony-list { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
-  .pony-list.big { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-  .ach-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .album-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .game-pick { grid-template-columns: 1fr; }
-
-  /* 弹窗 / 表格 */
-  .modal-card { width: 94%; max-height: 88vh; overflow-y: auto; padding: 16px; }
-  .streak-row { flex-wrap: wrap; }
-  .tr { grid-template-columns: 1fr auto; }
-  .tr.head { display: none; }
-  .tops { justify-content: flex-start; }
-  .stage-actions .btn { flex: 1; }
-}
-
-/* iPhone 刘海与底部横条 */
-body {
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-.app-footer { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
-.app-header { padding-top: env(safe-area-inset-top); }
-`;
+/* 手机适配样式与多文件版共用同一份文件，改一处两边同步 */
+const MOBILE_CSS = read('css/mobile.css');
 
 /* ---------------- 2. 脚本 ---------------- */
 
-const order = ['data', 'pony', 'store', 'home', 'shop', 'games', 'app'];
+const order = ['data', 'pony', 'cloud', 'store', 'home', 'shop', 'games', 'app'];
 const scripts = order.map((n) => ({ name: n, code: read('js/' + n + '.js') }));
 
 /* 家长端：破解按钮改用独立 id，且只在家长端区域内响应 */

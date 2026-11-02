@@ -199,12 +199,74 @@
       '  <button class="btn danger sm" id="resetBtn" type="button">恢复出厂</button>' +
       '</div>' +
       '<textarea id="ioBox" class="ta mono" rows="4" placeholder="导出的存档会显示在这里，也可以把存档文本粘贴进来再点导入。"></textarea>' +
+      cloudSection() +
       '<h3 class="sec-title">最近操作</h3>' +
       '<div class="log">' + (st.log.length ? st.log.slice(0, 12).map(function (l) {
         return '<div class="log-row"><span class="log-act">' + esc(l.action) + '</span>' +
           '<span class="log-detail">' + esc(l.detail) + '</span>' +
           '<span class="log-time">' + time(l.at) + '</span></div>';
       }).join('') : '<p class="muted">暂无记录</p>') + '</div>';
+  }
+
+  /* ---------- 云同步（Supabase） ---------- */
+
+  function cloudSection() {
+    var C = window.Cloud;
+    if (!C) return '';
+    var cfg = C.cfg();
+    var info = C.info();
+    var stateText = {
+      off: '未开启',
+      ok: info.msg || '已同步',
+      syncing: info.msg || '同步中…',
+      err: info.msg || '同步失败'
+    }[info.state] || '';
+    var stateCls = info.state === 'err' ? 'cloud-err' : (info.state === 'ok' ? 'cloud-ok' : '');
+
+    if (!cfg) {
+      return '<h3 class="sec-title">云同步（Supabase）</h3>' +
+        '<p class="muted">换手机 / 换电脑 / 清了浏览器缓存，存档也能找回来。配置一次即可，详见 README 的「云同步」章节。</p>' +
+        '<div class="form-col cloud-form">' +
+        '  <input id="clUrl" class="ipt" placeholder="项目 URL，形如 https://xxxxx.supabase.co">' +
+        '  <input id="clKey" class="ipt" placeholder="anon key（Settings → API 里复制）">' +
+        '  <div class="form-row">' +
+        '    <input id="clCode" class="ipt" placeholder="同步码（6~16 位字母数字）">' +
+        '    <button class="btn ghost sm" id="clGen" type="button">帮我生成</button>' +
+        '  </div>' +
+        '  <div class="form-row wrap">' +
+        '    <button class="btn primary sm" id="clSave" type="button">保存并开启</button>' +
+        '  </div>' +
+        '</div>';
+    }
+    return '<h3 class="sec-title">云同步（Supabase）· 已开启</h3>' +
+      '<p class="muted">同步码：<b class="cloud-code">' + esc(cfg.code) + '</b>（记到备忘录里，新设备上输入同一个码即可恢复）</p>' +
+      '<p class="cloud-state ' + stateCls + '">状态：' + esc(stateText) + '</p>' +
+      '<div class="form-row wrap">' +
+      '  <button class="btn ghost sm" id="clPush" type="button">立即上传</button>' +
+      '  <button class="btn ghost sm" id="clPull" type="button">从云端恢复</button>' +
+      '  <button class="btn danger sm" id="clOff" type="button">关闭云同步</button>' +
+      '</div>' +
+      '<details><summary class="muted sm">修改配置</summary>' +
+      '<div class="form-col cloud-form">' +
+      '  <input id="clUrl" class="ipt" placeholder="项目 URL" value="' + esc(cfg.url) + '">' +
+      '  <input id="clKey" class="ipt" placeholder="anon key（留空表示不修改）">' +
+      '  <div class="form-row">' +
+      '    <input id="clCode" class="ipt" value="' + esc(cfg.code) + '">' +
+      '  </div>' +
+      '  <div class="form-row wrap">' +
+      '    <button class="btn primary sm" id="clSave" type="button">保存修改</button>' +
+      '  </div>' +
+      '</div></details>';
+  }
+
+  function cloudRefresh() {
+    /* 只刷新状态行，避免整页重渲染打断输入 */
+    var box = el('.cloud-state');
+    if (!box || !window.Cloud) return;
+    var info = window.Cloud.info();
+    var stateText = { off: '未开启', ok: info.msg || '已同步', syncing: info.msg || '同步中…', err: info.msg || '同步失败' }[info.state] || '';
+    box.className = 'cloud-state ' + (info.state === 'err' ? 'cloud-err' : (info.state === 'ok' ? 'cloud-ok' : ''));
+    box.textContent = '状态：' + stateText;
   }
 
   /* ---------- 破解开关 ---------- */
@@ -419,6 +481,48 @@
         }
         return;
       }
+
+      /* ---------- 云同步 ---------- */
+      if ((n = hit('#clGen'))) {
+        var gc = el('#clCode');
+        if (gc) { gc.value = window.Cloud.newCode(); gc.focus(); }
+        return;
+      }
+      if ((n = hit('#clSave'))) {
+        var cu = el('#clUrl'), ck = el('#clKey'), cc = el('#clCode');
+        var r = window.Cloud.setCfg(cu ? cu.value : '', ck ? ck.value.trim() : '', cc ? cc.value : '');
+        if (r !== true) { toast(r); return; }
+        toast('云同步已开启');
+        render();
+        /* 首次配置：云端有就恢复，没有就把当前存档推上去 */
+        window.Cloud.pullNow().then(function (got) {
+          if (!got) return window.Cloud.pushNow().catch(function () {});
+        }).catch(function () { /* 状态行已显示错误 */ });
+        return;
+      }
+      if ((n = hit('#clPush'))) {
+        window.Cloud.pushNow().then(function () {
+          toast('已上传到云端');
+          cloudRefresh();
+        }).catch(function (e) { toast('上传失败：' + (e.message || e)); cloudRefresh(); });
+        return;
+      }
+      if ((n = hit('#clPull'))) {
+        if (!confirm('用云端的存档覆盖本机吗？本机未同步的改动会丢失。')) return;
+        window.Cloud.pullNow().then(function (got) {
+          toast(got ? '已从云端恢复' : '云端没有存档');
+          render();
+        }).catch(function (e) { toast('恢复失败：' + (e.message || e)); cloudRefresh(); });
+        return;
+      }
+      if ((n = hit('#clOff'))) {
+        if (confirm('关闭后本机不再自动备份（云端数据保留）。确定吗？')) {
+          window.Cloud.clearCfg();
+          toast('云同步已关闭');
+          render();
+        }
+        return;
+      }
       if ((n = hit('#saveGrade'))) {
         var gsel = el('#gradeSelect');
         if (gsel && S.setGrade(gsel.value)) toast('已更新年级，口算题难度同步调整');
@@ -574,6 +678,7 @@
     bind();
     renderCheatBtn();
     renderLock();
+    if (window.Cloud) window.Cloud.onChange(function () { cloudRefresh(); });
 
     /* 锁屏上的按钮：确定 / 换一题 */
     document.addEventListener('click', function (e) {

@@ -126,11 +126,48 @@ node build-single.js
 
 首次进入会弹打卡窗，连续打卡越久每天领得越多（`10 + min(连续天数-1, 10) × 5`，最多 60 ⭐），断签会重新计算。
 
+## ☁️ 云同步（Supabase，可选）
+
+本地存档默认存在浏览器 localStorage 里，**换设备 / 清缓存会丢**。配置 Supabase 云同步后，存档会自动备份到云端，换手机也能一键恢复。
+
+### 一次性准备（约 5 分钟）
+
+1. 到 [supabase.com](https://supabase.com) 注册（免费档即可），新建一个项目（区域选新加坡/东京，国内访问更稳）
+2. 项目里打开 **SQL Editor**，粘贴执行：
+
+   ```sql
+   create table saves (
+     code text primary key,
+     data jsonb not null,
+     updated_at timestamptz not null default now()
+   );
+   alter table saves enable row level security;
+   create policy "saves_all" on saves for all to anon using (true) with check (true);
+   ```
+
+3. 到 **Settings → API** 复制两样东西：**Project URL**（形如 `https://xxxxx.supabase.co`）和 **anon key**（`anon` / `public` 那个）
+
+### 游戏里配置
+
+家长端 → 「数据与设置」→ **云同步（Supabase）**：
+
+- 粘贴 URL 和 anon key，点「帮我生成」得到一个**同步码**（记到备忘录！），保存即开启
+- 之后每次游戏内存档变化会自动防抖上传（2.5 秒合并一次）；打开游戏时云端有更新的存档会自动恢复
+- **换新设备**：在新设备上输入**同一个同步码**（URL/key 也要填），打开游戏自动恢复存档
+- 「立即上传 / 从云端恢复」可手动操作，冲突时按「最后写入者优先」
+
+### 安全说明
+
+- anon key 本来就是设计为可以出现在前端代码里的（保护靠数据库规则），加上同步码是随机 10 位（32 种字符，不可枚举），别人既猜不到码也改不了你家数据
+- 配置只存在**你自己浏览器的 localStorage**，不会写进这个公开仓库
+- ⚠️ 免费层有流量配额（约 500MB / 5 万月活），自家玩绰绰有余；存档单份约 2KB
+
 ## 技术说明
 
 - 所有形象均由 SVG 图形拼装，`js/pony.js` 里按层顺序叠加：翅膀 → 后鬃毛 → 身体 → 头 → 角/耳 → 刘海 → 眼睛 → 口鼻 → 腮红 → 眼妆 → 发饰 → 额饰 → 头饰 → 眼镜 → 颈饰。新增饰品只需在对应 slot 下增加一个返回 SVG 片段的函数。
 - 房间、家具、窗户全部是手绘 SVG 字符串，无图片资源；小马与家具用 DOM + CSS 动画 + 单条 `requestAnimationFrame` 循环驱动。
-- 无第三方依赖，无网络请求；存档写在浏览器 localStorage（key `pony_studio_v1`），两个页面实时互通（`storage` 事件），支持导出/导入 JSON。
+- 无第三方依赖，无构建步骤；存档写在浏览器 localStorage（key `pony_studio_v1`），两个页面实时互通（`storage` 事件），支持导出/导入 JSON。
+- 云同步（`js/cloud.js`）直接 fetch 调 Supabase REST API（无 SDK），配置存 localStorage（key `pony_cloud_v2`），不进仓库；上传防抖 2.5s 合并，启动时比对 `savedAt` 决定是否用云端覆盖本地（最后写入者优先）。
 
 ## 免责声明
 
