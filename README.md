@@ -195,7 +195,24 @@ DATABASE_URL='jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user
 > 注：Render 会对部分新账号弹出信用卡验证（Stripe $1 预授权，不扣款，需 Visa/Mastercard）。
 > 不想绑卡就用下面的 Koyeb。
 
-### 部署到 Koyeb 免费档（约 10 分钟，无需绑卡）
+### 部署到 Hugging Face Spaces（免费 2核/16G，免绑卡、免审核，推荐）
+
+> Koyeb 新注册会进人工审核队列（等几天）；Render 会抽查绑卡。HF Spaces 是目前注册即用的路子。
+> 代价：48 小时无访问会休眠（下次访问约 30 秒唤醒）；免费档 Space 必须公开（代码公开，
+> 但 `DATABASE_URL` 走 Space 的 secret，不会暴露）。
+
+1. 到 [huggingface.co](https://huggingface.co) 注册并验证邮箱 → 右上角头像 → Settings → Access Tokens → 生成一个 **Write** 权限 token
+2. New → **Space**：名称如 `pony-server`，SDK 选 **Docker → Blank**，硬件 **Free CPU Basic**，Visibility **Public**
+3. 本机执行一键推送脚本（组装源码上下文并推到 Space 仓库）：
+   ```bash
+   cd deploy
+   ./push-hf.sh https://huggingface.co/spaces/你的用户名/pony-server hf_你的token
+   ```
+4. 构建约 5-8 分钟（Space 页面 Logs 可看进度）；完成后去 Space → **Settings → Variables and secrets** 添加：
+   `DATABASE_URL` = `jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user=postgres.xxx&password=你的密码`
+5. 访问 `https://你的用户名-pony-server.hf.space/api/health`，返回 `{"status":"ok"}` 即成功
+
+### 部署到 Koyeb 免费档（约 10 分钟，无需绑卡，但新账号要过人工审核）
 
 1. 仓库根目录已有 `Dockerfile`（多阶段构建：Maven 编译 → 仅 JRE 运行镜像）
 2. 到 [koyeb.com](https://www.koyeb.com) 用 GitHub 账号登录 → Create Service → **Web Service** → 选本仓库 master 分支
