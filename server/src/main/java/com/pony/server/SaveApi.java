@@ -77,6 +77,8 @@ public class SaveApi {
     public static class SaveController {
 
         private final JdbcTemplate jdbc;
+        private final com.fasterxml.jackson.databind.ObjectMapper mapper =
+            new com.fasterxml.jackson.databind.ObjectMapper();
 
         SaveController(JdbcTemplate jdbc) {
             this.jdbc = jdbc;
@@ -85,24 +87,39 @@ public class SaveApi {
         /** 读取存档：GET /api/saves/{code} */
         @GetMapping("/{code}")
         public ResponseEntity<Map<String, Object>> get(@PathVariable String code) {
+            // data::text 取出为 JSON 字符串，再解析回对象，避免 PGobject 被 Jackson 序列化成 {type,value}
             List<Map<String, Object>> rows = jdbc.queryForList(
-                "select data, updated_at from saves where code = ?", code);
+                "select data::text as data, updated_at from saves where code = ?", code);
             if (rows.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(rows.get(0));
+            Map<String, Object> row = rows.get(0);
+            try {
+                row.put("data", mapper.readValue((String) row.get("data"), Map.class));
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body(
+                    Map.of("error", "存档数据解析失败: " + e.getMessage()));
+            }
+            return ResponseEntity.ok(row);
         }
 
         /** 保存存档：PUT /api/saves/{code}，body 即 data（jsonb） */
         @PutMapping("/{code}")
         public ResponseEntity<Map<String, Object>> put(@PathVariable String code,
                                                        @RequestBody Map<String, Object> data) {
+            // 必须先序列化成 JSON 字符串：直接传 Map 会被 JDBC 驱动当 hstore 处理（Supabase 无该扩展）
+            String json;
+            try {
+                json = mapper.writeValueAsString(data);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("error", "无法序列化存档: " + e.getMessage()));
+            }
             jdbc.update("""
                 insert into saves (code, data, updated_at)
                 values (?::text, ?::jsonb, now())
                 on conflict (code) do update
                   set data = excluded.data, updated_at = now()
-                """, code, data);
+                """, code, json);
             OffsetDateTime at = jdbc.queryForObject(
                 "select updated_at from saves where code = ?", OffsetDateTime.class, code);
             return ResponseEntity.ok(Map.of("code", code, "updated_at", String.valueOf(at)));

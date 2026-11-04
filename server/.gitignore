@@ -1,2 +1,4 @@
 server/target/
 *.class
+# 本地密钥，绝不提交
+local.env
