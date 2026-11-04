@@ -162,6 +162,38 @@ node build-single.js
 - 配置只存在**你自己浏览器的 localStorage**，不会写进这个公开仓库
 - ⚠️ 免费层有流量配额（约 500MB / 5 万月活），自家玩绰绰有余；存档单份约 2KB
 
+## 🚀 后端部署（Spring Boot on Render，可选）
+
+`server/` 下是一个最小的 Spring Boot 3（Java 17）存档服务，直连 Supabase Postgres，可部署到 Render 免费档，替代前端直连 Supabase REST 的方式（适合以后加复杂业务逻辑时扩展）。
+
+### 本地运行
+
+```bash
+cd server
+mvn spring-boot:run        # 需要本机 JDK 17 + Maven
+# 指定 Supabase 连接串：
+DATABASE_URL='jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user=postgres.xxx&password=xxx' mvn spring-boot:run
+```
+
+接口：
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/health` | 健康检查 |
+| GET | `/api/saves/{code}` | 读存档（与前端 saves 表结构一致） |
+| PUT | `/api/saves/{code}` | 写存档，body 即 data（jsonb） |
+
+### 部署到 Render 免费档（约 10 分钟）
+
+1. 仓库根目录已有 `render.yaml`（Blueprint 清单）
+2. 到 [render.com](https://render.com) 用 GitHub 账号登录 → New → **Blueprint** → 选本仓库
+3. 创建时它会要求填 `DATABASE_URL`：去 Supabase → Project Settings → **Database → Connection pooling**（端口 **6543**），拼成 JDBC 串：
+   `jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user=postgres.xxx&password=你的密码`
+4. 首次构建约 5 分钟，之后每次 push 到 master 自动重新部署
+5. 免费档 15 分钟无流量会休眠，首次访问冷启动约 30-60 秒，`/api/health` 可用于唤醒
+
+注意：必须用 **Connection pooling（6543）** 连接串，不要用直连（5432），否则实例休眠恢复后会占满 Supabase 连接数。数据库密码在 Supabase → Settings → Database 里可以重置。
+
 ## 技术说明
 
 - 所有形象均由 SVG 图形拼装，`js/pony.js` 里按层顺序叠加：翅膀 → 后鬃毛 → 身体 → 头 → 角/耳 → 刘海 → 眼睛 → 口鼻 → 腮红 → 眼妆 → 发饰 → 额饰 → 头饰 → 眼镜 → 颈饰。新增饰品只需在对应 slot 下增加一个返回 SVG 片段的函数。

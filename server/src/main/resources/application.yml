@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  datasource:
+    # Supabase → Project Settings → Database → Connection pooling（端口 6543）
+    # 完整 JDBC 形如：jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user=postgres.xxx&password=xxx
+    # 通过环境变量注入，仓库里不落任何密钥；占位默认值保证无库时也能启动（仅 health 可用）
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # 免费实例内存小、会休眠：池开小 + 短超时，唤醒后快速自愈
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 10000
+      validation-timeout: 5000
+
+logging:
+  level:
+    root: INFO

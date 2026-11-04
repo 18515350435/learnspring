@@ -1,0 +1,15 @@
+# Render 一键部署清单（Blueprint）：https://render.com/docs/blueprint-spec
+# 在 Render 控制台选「Blueprint」并绑定本仓库即可，DATABASE_URL 需在控制台填入。
+services:
+  - type: web
+    name: pony-server
+    runtime: java
+    plan: free
+    rootDir: server
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -XX:MaxRAMPercentage=75 -jar target/pony-server-1.0.0.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: "17"
+      - key: DATABASE_URL
+        sync: false   # 在 Render 控制台填 Supabase 的 JDBC 连接串
