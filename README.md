@@ -162,7 +162,7 @@ node build-single.js
 - 配置只存在**你自己浏览器的 localStorage**，不会写进这个公开仓库
 - ⚠️ 免费层有流量配额（约 500MB / 5 万月活），自家玩绰绰有余；存档单份约 2KB
 
-## 🚀 后端部署（Spring Boot on Render，可选）
+## 🚀 后端部署（Spring Boot，可选）
 
 `server/` 下是一个最小的 Spring Boot 3（Java 17）存档服务，直连 Supabase Postgres，可部署到 Render 免费档，替代前端直连 Supabase REST 的方式（适合以后加复杂业务逻辑时扩展）。
 
@@ -191,6 +191,18 @@ DATABASE_URL='jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user
    `jdbc:postgresql://aws-0-xxx.pooler.supabase.com:6543/postgres?user=postgres.xxx&password=你的密码`
 4. 首次构建约 5 分钟，之后每次 push 到 master 自动重新部署
 5. 免费档 15 分钟无流量会休眠，首次访问冷启动约 30-60 秒，`/api/health` 可用于唤醒
+
+> 注：Render 会对部分新账号弹出信用卡验证（Stripe $1 预授权，不扣款，需 Visa/Mastercard）。
+> 不想绑卡就用下面的 Koyeb。
+
+### 部署到 Koyeb 免费档（约 10 分钟，无需绑卡）
+
+1. 仓库根目录已有 `Dockerfile`（多阶段构建：Maven 编译 → 仅 JRE 运行镜像）
+2. 到 [koyeb.com](https://www.koyeb.com) 用 GitHub 账号登录 → Create Service → **Web Service** → 选本仓库 master 分支
+3. Builder 选 **Dockerfile**，实例选 **Free（Nano）**
+4. 环境变量加一条 `DATABASE_URL`（同上，Supabase Connection pooling 的 JDBC 串）
+5. 端口保持默认（Koyeb 注入 `PORT`，应用已兼容）；Exposed port 填 `8080`
+6. 首次构建约 5-8 分钟（容器内跑 Maven），之后 push 自动重新部署；同样有休眠与冷启动
 
 注意：必须用 **Connection pooling（6543）** 连接串，不要用直连（5432），否则实例休眠恢复后会占满 Supabase 连接数。数据库密码在 Supabase → Settings → Database 里可以重置。
 
